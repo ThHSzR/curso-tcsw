@@ -4,9 +4,9 @@ export const Header = () => {
     const abas = [
         { label: 'Trilhas',      to: '/trilhas' },
         { label: 'Cursos',       to: '/cursos' },
-        { label: 'M\u00f3dulos',      to: '/modulos' },
+        { label: 'Módulos',      to: '/modulos' },
         { label: 'Aulas',        to: '/aulas' },
-        { label: 'Usu\u00e1rios',     to: '/usuarios' },
+        { label: 'Usuários',     to: '/usuarios' },
         { label: 'Assinaturas',  to: '/assinaturas' },
         { label: 'Certificados', to: '/certificados' },
     ];
@@ -22,7 +22,7 @@ export const Header = () => {
             >
                 <div className="offcanvas-header bg-dark text-white">
                     <h5 className="offcanvas-title" id="offcanvasMenuLabel">
-                        <i className="bi bi-mortarboard-fill me-2"></i>Plataforma
+                        <i className="bi bi-mortarboard-fill me-2"></i>SG Cursos
                     </h5>
                     <button
                         type="button"
@@ -75,7 +75,7 @@ export const Header = () => {
                 </button>
 
                 <NavLink className="navbar-brand fw-bold" to="/">
-                    <i className="bi bi-mortarboard-fill me-2"></i>Plataforma
+                    <i className="bi bi-mortarboard-fill me-2"></i>SG Cursos
                 </NavLink>
 
                 <button
