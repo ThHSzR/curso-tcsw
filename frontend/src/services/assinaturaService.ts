@@ -20,9 +20,6 @@ export const planoService = {
   getAll: (): Promise<Plano[]> =>
     fetch(`${BASE}/planos`).then(r => r.json()),
 
-  getById: (id: number): Promise<Plano> =>
-    fetch(`${BASE}/planos/${id}`).then(r => r.json()),
-
   create: (data: Omit<Plano, 'id'>): Promise<Plano> =>
     fetch(`${BASE}/planos`, {
       method: 'POST',
@@ -45,8 +42,8 @@ export const assinaturaService = {
   getAll: (): Promise<Assinatura[]> =>
     fetch(`${BASE}/assinaturas`).then(r => r.json()),
 
-  getByUsuario: (usuarioId: number): Promise<Assinatura[]> =>
-    fetch(`${BASE}/assinaturas?usuarioId=${usuarioId}`).then(r => r.json()),
+  getById: (id: number): Promise<Assinatura> =>
+    fetch(`${BASE}/assinaturas/${id}`).then(r => r.json()),
 
   create: (data: Omit<Assinatura, 'id'>): Promise<Assinatura> =>
     fetch(`${BASE}/assinaturas`, {

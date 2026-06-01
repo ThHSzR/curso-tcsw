@@ -5,10 +5,8 @@ export interface Curso {
   nome: string;
   descricao: string;
   cargaHoraria: number;
-  instrutorId: number;
-  categoriaId: number;
   nivelId: number;
-  trilhaId?: number;
+  trilhaId: number;
 }
 
 export const cursoService = {

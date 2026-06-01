@@ -3,6 +3,7 @@ const BASE = 'http://localhost:3001';
 export interface Modulo {
   id?: number;
   nome: string;
+  descricao: string;
   ordem: number;
   cursoId: number;
 }
@@ -10,9 +11,6 @@ export interface Modulo {
 export const moduloService = {
   getAll: (): Promise<Modulo[]> =>
     fetch(`${BASE}/modulos`).then(r => r.json()),
-
-  getByCurso: (cursoId: number): Promise<Modulo[]> =>
-    fetch(`${BASE}/modulos?cursoId=${cursoId}`).then(r => r.json()),
 
   getById: (id: number): Promise<Modulo> =>
     fetch(`${BASE}/modulos/${id}`).then(r => r.json()),

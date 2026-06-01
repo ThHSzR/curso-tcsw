@@ -4,8 +4,8 @@ export interface Usuario {
   id?: number;
   nome: string;
   email: string;
-  senha: string;
   tipo: 'aluno' | 'instrutor' | 'admin';
+  dataCadastro: string;
 }
 
 export const usuarioService = {
