@@ -7,12 +7,15 @@ import { Cursos }       from './pages/Cursos';
 import { Modulos }      from './pages/Modulos';
 import { Aulas }        from './pages/Aulas';
 import { Categorias }   from './pages/Categorias';
+import { Niveis }       from './pages/Niveis';
+import { Instrutores }  from './pages/Instrutores';
 import { Usuarios }     from './pages/Usuarios';
 import { Matriculas }   from './pages/Matriculas';
 import { Assinaturas }  from './pages/Assinaturas';
 import { Pagamentos }   from './pages/Pagamentos';
 import { Certificados } from './pages/Certificados';
 import { Avaliacoes }   from './pages/Avaliacoes';
+import { Planos }       from './pages/Planos';
 
 const navItems = [
   { section: 'Geral' },
@@ -20,16 +23,19 @@ const navItems = [
   { to: '/sgcursos',     label: 'Visão Geral',  icon: 'bi-bar-chart' },
   { section: 'Conteúdo' },
   { to: '/categorias',   label: 'Categorias',   icon: 'bi-tag' },
+  { to: '/niveis',       label: 'Níveis',       icon: 'bi-layers' },
   { to: '/trilhas',      label: 'Trilhas',      icon: 'bi-signpost-split' },
   { to: '/cursos',       label: 'Cursos',       icon: 'bi-mortarboard' },
   { to: '/modulos',      label: 'Módulos',      icon: 'bi-collection' },
   { to: '/aulas',        label: 'Aulas',        icon: 'bi-play-circle' },
-  { section: 'Alunos' },
+  { section: 'Pessoas' },
+  { to: '/instrutores',  label: 'Instrutores',  icon: 'bi-person-badge' },
   { to: '/usuarios',     label: 'Usuários',     icon: 'bi-people' },
   { to: '/matriculas',   label: 'Matrículas',   icon: 'bi-person-check' },
   { to: '/avaliacoes',   label: 'Avaliações',   icon: 'bi-star' },
   { to: '/certificados', label: 'Certificados', icon: 'bi-patch-check' },
   { section: 'Financeiro' },
+  { to: '/planos',       label: 'Planos',       icon: 'bi-card-list' },
   { to: '/assinaturas',  label: 'Assinaturas',  icon: 'bi-credit-card' },
   { to: '/pagamentos',   label: 'Pagamentos',   icon: 'bi-cash-stack' },
 ];
@@ -38,14 +44,17 @@ const pageTitles: Record<string, string> = {
   '/':             'Dashboard',
   '/sgcursos':     'Visão Geral',
   '/categorias':   'Categorias',
+  '/niveis':       'Níveis',
   '/trilhas':      'Trilhas',
   '/cursos':       'Cursos',
   '/modulos':      'Módulos',
   '/aulas':        'Aulas',
+  '/instrutores':  'Instrutores',
   '/usuarios':     'Usuários',
   '/matriculas':   'Matrículas',
   '/avaliacoes':   'Avaliações',
   '/certificados': 'Certificados',
+  '/planos':       'Planos',
   '/assinaturas':  'Assinaturas',
   '/pagamentos':   'Pagamentos',
 };
@@ -110,14 +119,17 @@ function Layout() {
           <Route path="/"             element={<Home />} />
           <Route path="/sgcursos"     element={<SGCursos />} />
           <Route path="/categorias"   element={<Categorias />} />
+          <Route path="/niveis"       element={<Niveis />} />
           <Route path="/trilhas"      element={<Trilhas />} />
           <Route path="/cursos"       element={<Cursos />} />
           <Route path="/modulos"      element={<Modulos />} />
           <Route path="/aulas"        element={<Aulas />} />
+          <Route path="/instrutores"  element={<Instrutores />} />
           <Route path="/usuarios"     element={<Usuarios />} />
           <Route path="/matriculas"   element={<Matriculas />} />
           <Route path="/avaliacoes"   element={<Avaliacoes />} />
           <Route path="/certificados" element={<Certificados />} />
+          <Route path="/planos"       element={<Planos />} />
           <Route path="/assinaturas"  element={<Assinaturas />} />
           <Route path="/pagamentos"   element={<Pagamentos />} />
         </Routes>
