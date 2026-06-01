@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plano } from '../../models/plano.model';
-import { planoService } from '../../services/planoService';
+import { planoService } from '../../services/assinaturaService';
+import type { Plano } from '../../services/assinaturaService';
 
 export function Planos() {
   const [planos, setPlanos] = useState<Plano[]>([]);

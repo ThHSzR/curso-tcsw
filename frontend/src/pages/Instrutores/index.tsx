@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Instrutor } from '../../models/instrutor.model';
 
-const BASE = 'http://localhost:3000/instrutores';
+const BASE = 'http://localhost:3001/instrutores';
 
 export function Instrutores() {
   const [instrutores, setInstrutores] = useState<Instrutor[]>([]);

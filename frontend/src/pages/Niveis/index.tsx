@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Nivel } from '../../models/nivel.model';
 
-const BASE = 'http://localhost:3000/niveis';
+const BASE = 'http://localhost:3001/niveis';
 
 export function Niveis() {
   const [niveis, setNiveis] = useState<Nivel[]>([]);
