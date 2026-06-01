@@ -43,7 +43,11 @@
     { "id": 1, "usuarioId": 1, "planoId": 2, "dataInicio": "2026-01-01", "dataFim": "2026-12-31", "status": "ativa" }
   ],
   "matriculas": [
-    { "id": 1, "usuarioId": 1, "cursoId": 1, "dataMatricula": "2026-01-15", "progresso": 75 }
+    { "id": 1, "usuarioId": 1, "cursoId": 1, "dataMatricula": "2026-01-15", "progresso": 75 },
+    { "id": 2, "usuarioId": 2, "cursoId": 2, "dataMatricula": "2026-02-01", "progresso": 30 }
+  ],
+  "avaliacoes": [
+    { "id": 1, "usuarioId": 1, "cursoId": 1, "nota": 5, "comentario": "Excelente curso!", "dataAvaliacao": "2026-03-10" }
   ],
   "certificados": [
     { "id": 1, "usuarioId": 1, "cursoId": 1, "dataEmissao": "2026-03-01", "codigo": "CERT-2026-001", "cargaHoraria": 40 }

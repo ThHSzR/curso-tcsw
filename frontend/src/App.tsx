@@ -6,35 +6,48 @@ import { Trilhas }      from './pages/Trilhas';
 import { Cursos }       from './pages/Cursos';
 import { Modulos }      from './pages/Modulos';
 import { Aulas }        from './pages/Aulas';
+import { Categorias }   from './pages/Categorias';
 import { Usuarios }     from './pages/Usuarios';
+import { Matriculas }   from './pages/Matriculas';
 import { Assinaturas }  from './pages/Assinaturas';
+import { Pagamentos }   from './pages/Pagamentos';
 import { Certificados } from './pages/Certificados';
+import { Avaliacoes }   from './pages/Avaliacoes';
 
 const navItems = [
   { section: 'Geral' },
-  { to: '/',            label: 'Dashboard', icon: 'bi-grid-1x2' },
-  { to: '/sgcursos',    label: 'Visão Geral', icon: 'bi-bar-chart' },
+  { to: '/',             label: 'Dashboard',   icon: 'bi-grid-1x2' },
+  { to: '/sgcursos',     label: 'Visão Geral',  icon: 'bi-bar-chart' },
   { section: 'Conteúdo' },
-  { to: '/trilhas',     label: 'Trilhas',    icon: 'bi-signpost-split' },
-  { to: '/cursos',      label: 'Cursos',     icon: 'bi-mortarboard' },
-  { to: '/modulos',     label: 'Módulos',    icon: 'bi-collection' },
-  { to: '/aulas',       label: 'Aulas',      icon: 'bi-play-circle' },
-  { section: 'Gestão' },
-  { to: '/usuarios',    label: 'Usuários',   icon: 'bi-people' },
-  { to: '/assinaturas', label: 'Assinaturas',icon: 'bi-credit-card' },
-  { to: '/certificados',label: 'Certificados',icon: 'bi-patch-check' },
+  { to: '/categorias',   label: 'Categorias',   icon: 'bi-tag' },
+  { to: '/trilhas',      label: 'Trilhas',      icon: 'bi-signpost-split' },
+  { to: '/cursos',       label: 'Cursos',       icon: 'bi-mortarboard' },
+  { to: '/modulos',      label: 'Módulos',      icon: 'bi-collection' },
+  { to: '/aulas',        label: 'Aulas',        icon: 'bi-play-circle' },
+  { section: 'Alunos' },
+  { to: '/usuarios',     label: 'Usuários',     icon: 'bi-people' },
+  { to: '/matriculas',   label: 'Matrículas',   icon: 'bi-person-check' },
+  { to: '/avaliacoes',   label: 'Avaliações',   icon: 'bi-star' },
+  { to: '/certificados', label: 'Certificados', icon: 'bi-patch-check' },
+  { section: 'Financeiro' },
+  { to: '/assinaturas',  label: 'Assinaturas',  icon: 'bi-credit-card' },
+  { to: '/pagamentos',   label: 'Pagamentos',   icon: 'bi-cash-stack' },
 ];
 
 const pageTitles: Record<string, string> = {
-  '/':            'Dashboard',
-  '/sgcursos':    'Visão Geral',
-  '/trilhas':     'Trilhas',
-  '/cursos':      'Cursos',
-  '/modulos':     'Módulos',
-  '/aulas':       'Aulas',
-  '/usuarios':    'Usuários',
-  '/assinaturas': 'Assinaturas',
-  '/certificados':'Certificados',
+  '/':             'Dashboard',
+  '/sgcursos':     'Visão Geral',
+  '/categorias':   'Categorias',
+  '/trilhas':      'Trilhas',
+  '/cursos':       'Cursos',
+  '/modulos':      'Módulos',
+  '/aulas':        'Aulas',
+  '/usuarios':     'Usuários',
+  '/matriculas':   'Matrículas',
+  '/avaliacoes':   'Avaliações',
+  '/certificados': 'Certificados',
+  '/assinaturas':  'Assinaturas',
+  '/pagamentos':   'Pagamentos',
 };
 
 function Layout() {
@@ -44,23 +57,20 @@ function Layout() {
 
   return (
     <div className="app-layout">
-      {/* Mobile toggle */}
       <button className="sidebar-toggle" onClick={() => setOpen(o => !o)}>
         <i className={`bi ${open ? 'bi-x-lg' : 'bi-list'}`}></i>
       </button>
 
-      {/* Overlay */}
       {open && (
         <div
-          style={{ position:'fixed', inset:0, zIndex:99, background:'rgba(0,0,0,0.5)' }}
+          style={{ position: 'fixed', inset: 0, zIndex: 99, background: 'rgba(0,0,0,0.5)' }}
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
       <aside className={`sidebar ${open ? 'open' : ''}`}>
         <NavLink to="/" className="sidebar-logo" onClick={() => setOpen(false)}>
-          <div className="sidebar-logo-icon"><i className="bi bi-mortarboard-fill" style={{color:'#fff'}}></i></div>
+          <div className="sidebar-logo-icon"><i className="bi bi-mortarboard-fill" style={{ color: '#fff' }}></i></div>
           <span className="sidebar-logo-text">SG<span>Cursos</span></span>
         </NavLink>
 
@@ -88,7 +98,6 @@ function Layout() {
         </div>
       </aside>
 
-      {/* Main */}
       <div className="main-content">
         <header className="topbar">
           <span className="topbar-title">{title}</span>
@@ -100,13 +109,17 @@ function Layout() {
         <Routes>
           <Route path="/"             element={<Home />} />
           <Route path="/sgcursos"     element={<SGCursos />} />
+          <Route path="/categorias"   element={<Categorias />} />
           <Route path="/trilhas"      element={<Trilhas />} />
           <Route path="/cursos"       element={<Cursos />} />
           <Route path="/modulos"      element={<Modulos />} />
           <Route path="/aulas"        element={<Aulas />} />
           <Route path="/usuarios"     element={<Usuarios />} />
-          <Route path="/assinaturas"  element={<Assinaturas />} />
+          <Route path="/matriculas"   element={<Matriculas />} />
+          <Route path="/avaliacoes"   element={<Avaliacoes />} />
           <Route path="/certificados" element={<Certificados />} />
+          <Route path="/assinaturas"  element={<Assinaturas />} />
+          <Route path="/pagamentos"   element={<Pagamentos />} />
         </Routes>
       </div>
     </div>
