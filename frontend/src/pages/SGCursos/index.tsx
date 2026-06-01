@@ -1,17 +1,61 @@
-export function SGCursos() {
-  const items = [
-    { label: 'Total de matrículas', value: '1.204', trend: '+12%', icon: 'bi-person-check', color: 'var(--primary)' },
-    { label: 'Receita mensal',      value: 'R$ 18.450', trend: '+8%', icon: 'bi-currency-dollar', color: 'var(--success)' },
-    { label: 'Cursos ativos',       value: '12',   trend: '+2',  icon: 'bi-mortarboard',  color: 'var(--info)' },
-    { label: 'Taxa de conclusão',   value: '68%',  trend: '+3%', icon: 'bi-trophy',       color: 'var(--warning)' },
-  ];
+import { useState, useEffect } from 'react';
+import { cursoService }      from '../../services/cursoService';
+import type { Curso }        from '../../services/cursoService';
+import { matriculaService }  from '../../services/matriculaService';
+import { assinaturaService } from '../../services/assinaturaService';
+import { certificadoService } from '../../services/certificadoService';
+import { nivelService }      from '../../services/nivelService';
 
-  const recent = [
-    { nome: 'React do Zero',     alunos: 342, status: 'Ativo',    nivel: 'Iniciante' },
-    { nome: 'Figma Avançado',    alunos: 198, status: 'Ativo',    nivel: 'Avançado' },
-    { nome: 'Node.js com APIs',  alunos: 287, status: 'Ativo',    nivel: 'Intermediário' },
-    { nome: 'SQL na Prática',    alunos: 156, status: 'Rascunho', nivel: 'Iniciante' },
-    { nome: 'UX Design',         alunos: 221, status: 'Ativo',    nivel: 'Intermediário' },
+export function SGCursos() {
+  const [cursos, setCursos]         = useState<Curso[]>([]);
+  const [totalMatriculas, setTotalMatriculas] = useState(0);
+  const [receitaMensal, setReceitaMensal]     = useState(0);
+  const [taxaConclusao, setTaxaConclusao]     = useState(0);
+  const [niveis, setNiveis]         = useState<{id:number; nome:string}[]>([]);
+  const [loading, setLoading]       = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [cs, matriculas, assinaturas, certs, nvs] = await Promise.all([
+          cursoService.getAll(),
+          matriculaService.getAll(),
+          assinaturaService.getAll(),
+          certificadoService.getAll(),
+          nivelService.getAll(),
+        ]);
+
+        setCursos(cs);
+        setNiveis(nvs);
+        setTotalMatriculas(matriculas.length);
+
+        // receita = soma dos precos dos planos das assinaturas ativas
+        const { planoService } = await import('../../services/assinaturaService');
+        const planos = await planoService.getAll();
+        const ativas = assinaturas.filter((a: { status: string }) => a.status === 'ativa');
+        const receita = ativas.reduce((acc: number, a: { planoId: number }) => {
+          const plano = planos.find((p: { id: number; preco: number }) => p.id === a.planoId);
+          return acc + (plano?.preco ?? 0);
+        }, 0);
+        setReceitaMensal(receita);
+
+        // taxa de conclusao = matriculas com progresso 100% / total
+        const concluidas = matriculas.filter((m: { progresso: number }) => m.progresso === 100).length;
+        setTaxaConclusao(matriculas.length > 0 ? Math.round((concluidas / matriculas.length) * 100) : 0);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const getNivel = (nivelId: number) => niveis.find(n => n.id === nivelId)?.nome ?? '-';
+
+  const kpis = [
+    { label: 'Total de matrículas', value: loading ? '—' : String(totalMatriculas),                  icon: 'bi-person-check',     color: 'var(--primary)' },
+    { label: 'Receita (assinaturas ativas)', value: loading ? '—' : `R$ ${receitaMensal.toFixed(2)}`,  icon: 'bi-currency-dollar',  color: 'var(--success)' },
+    { label: 'Cursos cadastrados',  value: loading ? '—' : String(cursos.length),                      icon: 'bi-mortarboard',      color: 'var(--info)' },
+    { label: 'Taxa de conclusão',   value: loading ? '—' : `${taxaConclusao}%`,                       icon: 'bi-trophy',           color: 'var(--warning)' },
   ];
 
   return (
@@ -24,16 +68,15 @@ export function SGCursos() {
       </div>
 
       <div className="stat-grid" style={{ marginBottom: 24 }}>
-        {items.map(i => (
+        {kpis.map(i => (
           <div className="stat-card" key={i.label}>
             <div className="stat-icon" style={{ background: 'var(--surface-3)', color: i.color }}>
               <i className={`bi ${i.icon}`}></i>
             </div>
             <div>
               <div className="stat-value">{i.value}</div>
-              <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:4 }}>
-                <span style={{ fontSize:11, color:'var(--text-muted)' }}>{i.label}</span>
-                <span style={{ fontSize:11, color:'var(--success)', background:'var(--success-light)', padding:'1px 6px', borderRadius:99 }}>{i.trend}</span>
+              <div style={{ marginTop: 4 }}>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{i.label}</span>
               </div>
             </div>
           </div>
@@ -42,26 +85,29 @@ export function SGCursos() {
 
       <div className="table-wrapper">
         <div className="table-toolbar">
-          <span className="table-toolbar-title">Cursos mais populares</span>
+          <span className="table-toolbar-title">Cursos cadastrados</span>
         </div>
         <table>
           <thead>
             <tr>
               <th>Curso</th>
-              <th>Alunos</th>
+              <th>Carga Horária</th>
               <th>Nível</th>
-              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {recent.map(r => (
-              <tr key={r.nome}>
-                <td style={{ fontWeight: 500 }}>{r.nome}</td>
-                <td className="td-muted">{r.alunos}</td>
-                <td><span className="badge badge-muted">{r.nivel}</span></td>
-                <td><span className={`badge ${r.status === 'Ativo' ? 'badge-success' : 'badge-warning'}`}>{r.status}</span></td>
-              </tr>
-            ))}
+            {loading
+              ? <tr><td colSpan={3} className="table-empty"><i className="bi bi-arrow-repeat"></i><p>Carregando...</p></td></tr>
+              : cursos.length === 0
+                ? <tr><td colSpan={3} className="table-empty"><i className="bi bi-inbox"></i><p>Nenhum curso</p></td></tr>
+                : cursos.map(c => (
+                  <tr key={c.id}>
+                    <td style={{ fontWeight: 500 }}>{c.nome}</td>
+                    <td className="td-muted">{c.cargaHoraria}h</td>
+                    <td><span className="badge badge-muted">{getNivel(c.nivelId)}</span></td>
+                  </tr>
+                ))
+            }
           </tbody>
         </table>
       </div>
