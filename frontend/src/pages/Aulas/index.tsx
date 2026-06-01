@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../../components/Modal';
 import { Toast } from '../../components/Toast';
-import { aulaService, Aula } from '../../services/aulaService';
-import { moduloService, Modulo } from '../../services/moduloService';
+import { aulaService } from '../../services/aulaService';
+import type { Aula } from '../../services/aulaService';
+import { moduloService } from '../../services/moduloService';
+import type { Modulo } from '../../services/moduloService';
 
 export function Aulas() {
   const [items, setItems]       = useState<Aula[]>([]);
@@ -88,8 +90,7 @@ export function Aulas() {
           <div className="field"><label>Descrição</label><textarea className="textarea" value={form.descricao} onChange={e=>setForm(f=>({...f,descricao:e.target.value}))} /></div>
           <div className="field"><label>URL</label><input className="input" value={form.url} onChange={e=>setForm(f=>({...f,url:e.target.value}))} placeholder="https://..." /></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
-            <div className="field"><label>Tipo</label><select className="select" value={form.tipo} onChange={e=>setForm(f=>({...f,tipo:e.target.value as Aula['tipo']}))}>
-              <option value="video">Vídeo</option><option value="texto">Texto</option><option value="quiz">Quiz</option>
+            <div className="field"><label>Tipo</label><select className="select" value={form.tipo} onChange={e=>setForm(f=>({...f,tipo:e.target.value as Aula['tipo']}))}>               <option value="video">Vídeo</option><option value="texto">Texto</option><option value="quiz">Quiz</option>
             </select></div>
             <div className="field"><label>Duração (min)</label><input className="input" type="number" value={form.duracao} onChange={e=>setForm(f=>({...f,duracao:+e.target.value}))} /></div>
             <div className="field"><label>Ordem</label><input className="input" type="number" min={1} value={form.ordem} onChange={e=>setForm(f=>({...f,ordem:+e.target.value}))} /></div>

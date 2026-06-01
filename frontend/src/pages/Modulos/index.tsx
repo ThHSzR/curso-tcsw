@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../../components/Modal';
 import { Toast } from '../../components/Toast';
-import { moduloService, Modulo } from '../../services/moduloService';
-import { cursoService, Curso } from '../../services/cursoService';
+import { moduloService } from '../../services/moduloService';
+import type { Modulo } from '../../services/moduloService';
+import { cursoService } from '../../services/cursoService';
+import type { Curso } from '../../services/cursoService';
 
 export function Modulos() {
   const [items, setItems]       = useState<Modulo[]>([]);
@@ -10,7 +12,7 @@ export function Modulos() {
   const [search, setSearch]     = useState('');
   const [modal, setModal]       = useState<'add'|'edit'|'del'|null>(null);
   const [selected, setSelected] = useState<Modulo|null>(null);
-  const [form, setForm]         = useState({ nome:'', ordem:1, cursoId:0 });
+  const [form, setForm]         = useState({ nome:'', descricao:'', ordem:1, cursoId:0 });
   const [toast, setToast]       = useState<{msg:string;type:'success'|'error'}|null>(null);
   const [loading, setLoading]   = useState(true);
 
@@ -22,14 +24,14 @@ export function Modulos() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd  = () => { setForm({ nome:'', ordem:1, cursoId: cursos[0]?.id??0 }); setModal('add'); };
-  const openEdit = (m: Modulo) => { setSelected(m); setForm({ nome:m.nome, ordem:m.ordem, cursoId:m.cursoId }); setModal('edit'); };
+  const openAdd  = () => { setForm({ nome:'', descricao:'', ordem:1, cursoId: cursos[0]?.id??0 }); setModal('add'); };
+  const openEdit = (m: Modulo) => { setSelected(m); setForm({ nome:m.nome, descricao:m.descricao, ordem:m.ordem, cursoId:m.cursoId }); setModal('edit'); };
   const openDel  = (m: Modulo) => { setSelected(m); setModal('del'); };
 
   const save = async () => {
     try {
       if (modal==='add') await moduloService.create(form);
-      else if (modal==='edit' && selected) await moduloService.update(selected.id!, form);
+      else if (modal==='edit'&&selected) await moduloService.update(selected.id!, form);
       await load(); setModal(null);
       setToast({ msg: modal==='add'?'Módulo criado!':'Módulo atualizado!', type:'success' });
     } catch { setToast({ msg:'Erro ao salvar', type:'error' }); }
@@ -40,8 +42,8 @@ export function Modulos() {
     catch { setToast({ msg:'Erro ao remover', type:'error' }); }
   };
 
-  const filtered = items.filter(i => i.nome.toLowerCase().includes(search.toLowerCase()));
-  const getCurso = (id:number) => cursos.find(c=>c.id===id)?.nome ?? '-';
+  const filtered  = items.filter(i => i.nome.toLowerCase().includes(search.toLowerCase()));
+  const getCurso  = (id:number) => cursos.find(c=>c.id===id)?.nome ?? '-';
 
   return (
     <div className="page">
@@ -66,7 +68,7 @@ export function Modulos() {
               <tr key={m.id}>
                 <td className="td-muted">{m.id}</td>
                 <td style={{fontWeight:500}}>{m.nome}</td>
-                <td><span className="badge badge-info">{getCurso(m.cursoId)}</span></td>
+                <td className="td-muted">{getCurso(m.cursoId)}</td>
                 <td><span className="badge badge-muted">#{m.ordem}</span></td>
                 <td><div className="table-actions">
                   <button className="btn btn-ghost btn-icon btn-sm" onClick={()=>openEdit(m)}><i className="bi bi-pencil"></i></button>
@@ -81,9 +83,10 @@ export function Modulos() {
       {(modal==='add'||modal==='edit') && (
         <Modal title={modal==='add'?'Novo Módulo':'Editar Módulo'} onClose={()=>setModal(null)} onConfirm={save}>
           <div className="field"><label>Nome</label><input className="input" value={form.nome} onChange={e=>setForm(f=>({...f,nome:e.target.value}))} /></div>
+          <div className="field"><label>Descrição</label><textarea className="textarea" value={form.descricao} onChange={e=>setForm(f=>({...f,descricao:e.target.value}))} /></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-            <div className="field"><label>Curso</label><select className="select" value={form.cursoId} onChange={e=>setForm(f=>({...f,cursoId:+e.target.value}))}>{cursos.map(c=><option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
             <div className="field"><label>Ordem</label><input className="input" type="number" min={1} value={form.ordem} onChange={e=>setForm(f=>({...f,ordem:+e.target.value}))} /></div>
+            <div className="field"><label>Curso</label><select className="select" value={form.cursoId} onChange={e=>setForm(f=>({...f,cursoId:+e.target.value}))}>{cursos.map(c=><option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
           </div>
         </Modal>
       )}

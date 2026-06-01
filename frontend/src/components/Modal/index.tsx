@@ -1,21 +1,21 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
-interface ModalProps {
+interface Props {
   title: string;
+  children: ReactNode;
   onClose: () => void;
   onConfirm?: () => void;
   confirmLabel?: string;
   confirmClass?: string;
-  children: ReactNode;
 }
 
-export function Modal({ title, onClose, onConfirm, confirmLabel = 'Salvar', confirmClass = 'btn btn-primary', children }: ModalProps) {
+export function Modal({ title, children, onClose, onConfirm, confirmLabel = 'Salvar', confirmClass = 'btn btn-primary' }: Props) {
   return (
-    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <span className="modal-title">{title}</span>
-          <button className="modal-close" onClick={onClose}><i className="bi bi-x"></i></button>
+          <h2 className="modal-title">{title}</h2>
+          <button className="modal-close" onClick={onClose}><i className="bi bi-x-lg"></i></button>
         </div>
         <div className="modal-body">{children}</div>
         {onConfirm && (

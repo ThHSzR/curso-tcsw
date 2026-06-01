@@ -1,26 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../../components/Modal';
 import { Toast } from '../../components/Toast';
-import { usuarioService, Usuario } from '../../services/usuarioService';
+import { usuarioService } from '../../services/usuarioService';
+import type { Usuario } from '../../services/usuarioService';
 
 export function Usuarios() {
   const [items, setItems]       = useState<Usuario[]>([]);
   const [search, setSearch]     = useState('');
   const [modal, setModal]       = useState<'add'|'edit'|'del'|null>(null);
   const [selected, setSelected] = useState<Usuario|null>(null);
-  const [form, setForm]         = useState({ nome:'', email:'', senha:'', tipo:'aluno' as Usuario['tipo'] });
+  const [form, setForm]         = useState({ nome:'', email:'', senha:'', tipo:'aluno' as Usuario['tipo'], dataCadastro: new Date().toISOString().slice(0,10) });
   const [toast, setToast]       = useState<{msg:string;type:'success'|'error'}|null>(null);
   const [loading, setLoading]   = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    setItems(await usuarioService.getAll()); setLoading(false);
+    setItems(await usuarioService.getAll());
+    setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd  = () => { setForm({ nome:'', email:'', senha:'', tipo:'aluno' }); setModal('add'); };
-  const openEdit = (u: Usuario) => { setSelected(u); setForm({ nome:u.nome, email:u.email, senha:u.senha, tipo:u.tipo }); setModal('edit'); };
+  const openAdd  = () => { setForm({ nome:'', email:'', senha:'', tipo:'aluno', dataCadastro: new Date().toISOString().slice(0,10) }); setModal('add'); };
+  const openEdit = (u: Usuario) => { setSelected(u); setForm({ nome:u.nome, email:u.email, senha:u.senha, tipo:u.tipo, dataCadastro:u.dataCadastro }); setModal('edit'); };
   const openDel  = (u: Usuario) => { setSelected(u); setModal('del'); };
 
   const save = async () => {
@@ -38,8 +40,8 @@ export function Usuarios() {
   };
 
   const filtered = items.filter(i => i.nome.toLowerCase().includes(search.toLowerCase()) || i.email.toLowerCase().includes(search.toLowerCase()));
-  const tipoBadge = (t:string) => t==='admin'?'badge-danger':t==='instrutor'?'badge-warning':'badge-primary';
-  const initials  = (nome:string) => nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+  const tipoBadge = (t:string) => t==='admin'?'badge-danger':t==='instrutor'?'badge-warning':'badge-info';
+  const initials  = (nome:string) => nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
 
   return (
     <div className="page">
@@ -56,21 +58,20 @@ export function Usuarios() {
           </div>
         </div>
         <table>
-          <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Tipo</th><th>Ações</th></tr></thead>
+          <thead><tr><th>#</th><th>Usuário</th><th>Email</th><th>Tipo</th><th>Cadastro</th><th>Ações</th></tr></thead>
           <tbody>
-            {loading ? <tr><td colSpan={5} className="table-empty"><i className="bi bi-arrow-repeat"></i><p>Carregando...</p></td></tr>
-            : filtered.length===0 ? <tr><td colSpan={5} className="table-empty"><i className="bi bi-inbox"></i><p>Nenhum usuário</p></td></tr>
+            {loading ? <tr><td colSpan={6} className="table-empty"><i className="bi bi-arrow-repeat"></i><p>Carregando...</p></td></tr>
+            : filtered.length===0 ? <tr><td colSpan={6} className="table-empty"><i className="bi bi-inbox"></i><p>Nenhum usuário</p></td></tr>
             : filtered.map(u => (
               <tr key={u.id}>
                 <td className="td-muted">{u.id}</td>
-                <td>
-                  <div style={{display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{width:30,height:30,borderRadius:'50%',background:'var(--primary-light)',color:'var(--primary-hover)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,flexShrink:0}}>{initials(u.nome)}</div>
-                    <span style={{fontWeight:500}}>{u.nome}</span>
-                  </div>
-                </td>
+                <td><div style={{display:'flex',alignItems:'center',gap:10}}>
+                  <div style={{width:32,height:32,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0}}>{initials(u.nome)}</div>
+                  <span style={{fontWeight:500}}>{u.nome}</span>
+                </div></td>
                 <td className="td-muted">{u.email}</td>
                 <td><span className={`badge ${tipoBadge(u.tipo)}`}>{u.tipo}</span></td>
+                <td className="td-muted">{u.dataCadastro}</td>
                 <td><div className="table-actions">
                   <button className="btn btn-ghost btn-icon btn-sm" onClick={()=>openEdit(u)}><i className="bi bi-pencil"></i></button>
                   <button className="btn btn-danger btn-icon btn-sm" onClick={()=>openDel(u)}><i className="bi bi-trash3"></i></button>
@@ -84,11 +85,12 @@ export function Usuarios() {
       {(modal==='add'||modal==='edit') && (
         <Modal title={modal==='add'?'Novo Usuário':'Editar Usuário'} onClose={()=>setModal(null)} onConfirm={save}>
           <div className="field"><label>Nome</label><input className="input" value={form.nome} onChange={e=>setForm(f=>({...f,nome:e.target.value}))} /></div>
-          <div className="field"><label>E-mail</label><input className="input" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} /></div>
+          <div className="field"><label>Email</label><input className="input" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} /></div>
+          <div className="field"><label>Senha</label><input className="input" type="password" value={form.senha} onChange={e=>setForm(f=>({...f,senha:e.target.value}))} /></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-            <div className="field"><label>Senha</label><input className="input" type="password" value={form.senha} onChange={e=>setForm(f=>({...f,senha:e.target.value}))} /></div>
-            <div className="field"><label>Tipo</label><select className="select" value={form.tipo} onChange={e=>setForm(f=>({...f,tipo:e.target.value as Usuario['tipo']}))}
-              ><option value="aluno">Aluno</option><option value="instrutor">Instrutor</option><option value="admin">Admin</option></select></div>
+            <div className="field"><label>Tipo</label><select className="select" value={form.tipo} onChange={e=>setForm(f=>({...f,tipo:e.target.value as Usuario['tipo']}))}>               <option value="aluno">Aluno</option><option value="instrutor">Instrutor</option><option value="admin">Admin</option>
+            </select></div>
+            <div className="field"><label>Data de Cadastro</label><input className="input" type="date" value={form.dataCadastro} onChange={e=>setForm(f=>({...f,dataCadastro:e.target.value}))} /></div>
           </div>
         </Modal>
       )}

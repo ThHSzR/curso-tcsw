@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../../components/Modal';
 import { Toast } from '../../components/Toast';
-import { trilhaService, Trilha } from '../../services/trilhaService';
-import { categoriaService, Categoria } from '../../services/categoriaService';
+import { trilhaService } from '../../services/trilhaService';
+import type { Trilha } from '../../services/trilhaService';
+import { categoriaService } from '../../services/categoriaService';
+import type { Categoria } from '../../services/categoriaService';
 
 export function Trilhas() {
   const [items, setItems]         = useState<Trilha[]>([]);
