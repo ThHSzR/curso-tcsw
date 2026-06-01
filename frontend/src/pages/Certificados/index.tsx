@@ -47,10 +47,11 @@ export function Certificados() {
     catch { setToast({ msg:'Erro ao remover', type:'error' }); }
   };
 
-  const filtered  = items.filter(i => getUser(i.usuarioId).toLowerCase().includes(search.toLowerCase()));
-  const getUser   = (id:number) => usuarios.find(u=>u.id===id)?.nome ?? '-';
-  const getCurso  = (id:number) => cursos.find(c=>c.id===id)?.nome ?? '-';
-  const getCarga  = (id:number) => cursos.find(c=>c.id===id)?.cargaHoraria ?? 0;
+  const getUser  = (id:number) => usuarios.find(u=>u.id===id)?.nome ?? '-';
+  const getCurso = (id:number) => cursos.find(c=>c.id===id)?.nome ?? '-';
+  const getCarga = (id:number) => cursos.find(c=>c.id===id)?.cargaHoraria ?? 0;
+
+  const filtered = items.filter(i => getUser(i.usuarioId).toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="page">

@@ -49,10 +49,11 @@ export function Assinaturas() {
     catch { setToast({ msg:'Erro ao criar plano', type:'error' }); }
   };
 
-  const filtered   = items.filter(i => getUser(i.usuarioId).toLowerCase().includes(search.toLowerCase()));
-  const getUser    = (id:number) => usuarios.find(u=>u.id===id)?.nome ?? '-';
-  const getPlano   = (id:number) => planos.find(p=>p.id===id)?.nome ?? '-';
+  const getUser     = (id:number) => usuarios.find(u=>u.id===id)?.nome ?? '-';
+  const getPlano    = (id:number) => planos.find(p=>p.id===id)?.nome ?? '-';
   const statusBadge = (s:string) => s==='ativa'?'badge-success':s==='cancelada'?'badge-danger':'badge-muted';
+
+  const filtered = items.filter(i => getUser(i.usuarioId).toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="page">
