@@ -22,17 +22,17 @@
     { "id": 2, "nome": "Figma Avançado", "descricao": "Protótipos e componentes", "cargaHoraria": 20, "instrutorId": 2, "categoriaId": 2, "nivelId": 3, "trilhaId": 2 }
   ],
   "modulos": [
-    { "id": 1, "nome": "Introdução ao React", "ordem": 1, "cursoId": 1 },
-    { "id": 2, "nome": "Hooks e Estado", "ordem": 2, "cursoId": 1 },
-    { "id": 3, "nome": "Fundamentos do Figma", "ordem": 1, "cursoId": 2 }
+    { "id": 1, "nome": "Introdução ao React", "descricao": "Visão geral e configuração do ambiente", "ordem": 1, "cursoId": 1 },
+    { "id": 2, "nome": "Hooks e Estado", "descricao": "useState, useEffect e hooks customizados", "ordem": 2, "cursoId": 1 },
+    { "id": 3, "nome": "Fundamentos do Figma", "descricao": "Interface, ferramentas e fluxo de trabalho", "ordem": 1, "cursoId": 2 }
   ],
   "aulas": [
     { "id": 1, "nome": "O que é React?", "descricao": "Visão geral do framework", "tipo": "video", "url": "https://youtube.com", "duracao": 15, "ordem": 1, "moduloId": 1 },
     { "id": 2, "nome": "useState", "descricao": "Gerenciando estado local", "tipo": "video", "url": "https://youtube.com", "duracao": 20, "ordem": 1, "moduloId": 2 }
   ],
   "usuarios": [
-    { "id": 1, "nome": "João Souza", "email": "joao@email.com", "senha": "123456", "tipo": "aluno" },
-    { "id": 2, "nome": "Maria Fernanda", "email": "maria@email.com", "senha": "123456", "tipo": "admin" }
+    { "id": 1, "nome": "João Souza", "email": "joao@email.com", "senha": "123456", "tipo": "aluno", "dataCadastro": "2026-01-01" },
+    { "id": 2, "nome": "Maria Fernanda", "email": "maria@email.com", "senha": "123456", "tipo": "admin", "dataCadastro": "2026-01-01" }
   ],
   "planos": [
     { "id": 1, "nome": "Básico", "preco": 29.90, "descricao": "Acesso a cursos gratuitos" },
@@ -46,7 +46,7 @@
     { "id": 1, "usuarioId": 1, "cursoId": 1, "dataMatricula": "2026-01-15", "progresso": 75 }
   ],
   "certificados": [
-    { "id": 1, "usuarioId": 1, "cursoId": 1, "matriculaId": 1, "dataEmissao": "2026-03-01", "codigo": "CERT-2026-001" }
+    { "id": 1, "usuarioId": 1, "cursoId": 1, "dataEmissao": "2026-03-01", "codigo": "CERT-2026-001", "cargaHoraria": 40 }
   ],
   "pagamentos": [
     { "id": 1, "usuarioId": 1, "assinaturaId": 1, "valor": 59.90, "metodo": "cartao", "status": "aprovado", "dataPagamento": "2026-01-01" }
