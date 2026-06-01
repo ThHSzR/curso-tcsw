@@ -1,47 +1,42 @@
 import { useState, useEffect } from 'react';
-import { cursoService }      from '../../services/cursoService';
-import type { Curso }        from '../../services/cursoService';
-import { matriculaService }  from '../../services/matriculaService';
-import { assinaturaService } from '../../services/assinaturaService';
-import { certificadoService } from '../../services/certificadoService';
-import { nivelService }      from '../../services/nivelService';
+import { cursoService }                      from '../../services/cursoService';
+import type { Curso }                        from '../../services/cursoService';
+import { assinaturaService, planoService }   from '../../services/assinaturaService';
+import type { Assinatura, Plano }            from '../../services/assinaturaService';
+import { certificadoService }               from '../../services/certificadoService';
+import { nivelService }                     from '../../services/nivelService';
 
 export function SGCursos() {
-  const [cursos, setCursos]         = useState<Curso[]>([]);
-  const [totalMatriculas, setTotalMatriculas] = useState(0);
-  const [receitaMensal, setReceitaMensal]     = useState(0);
-  const [taxaConclusao, setTaxaConclusao]     = useState(0);
-  const [niveis, setNiveis]         = useState<{id:number; nome:string}[]>([]);
-  const [loading, setLoading]       = useState(true);
+  const [cursos, setCursos]           = useState<Curso[]>([]);
+  const [receitaMensal, setReceita]   = useState(0);
+  const [assinaturasAtivas, setAtivas] = useState(0);
+  const [totalCerts, setTotalCerts]   = useState(0);
+  const [niveis, setNiveis]           = useState<{ id: number; nome: string }[]>([]);
+  const [loading, setLoading]         = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [cs, matriculas, assinaturas, certs, nvs] = await Promise.all([
+        const [cs, assinaturas, planos, certs, nvs] = await Promise.all([
           cursoService.getAll(),
-          matriculaService.getAll(),
           assinaturaService.getAll(),
+          planoService.getAll(),
           certificadoService.getAll(),
           nivelService.getAll(),
         ]);
 
         setCursos(cs);
         setNiveis(nvs);
-        setTotalMatriculas(matriculas.length);
+        setTotalCerts(certs.length);
 
-        // receita = soma dos precos dos planos das assinaturas ativas
-        const { planoService } = await import('../../services/assinaturaService');
-        const planos = await planoService.getAll();
-        const ativas = assinaturas.filter((a: { status: string }) => a.status === 'ativa');
-        const receita = ativas.reduce((acc: number, a: { planoId: number }) => {
-          const plano = planos.find((p: { id: number; preco: number }) => p.id === a.planoId);
+        const ativas = (assinaturas as Assinatura[]).filter(a => a.status === 'ativa');
+        setAtivas(ativas.length);
+
+        const receita = ativas.reduce((acc, a) => {
+          const plano = (planos as Plano[]).find(p => p.id === a.planoId);
           return acc + (plano?.preco ?? 0);
         }, 0);
-        setReceitaMensal(receita);
-
-        // taxa de conclusao = matriculas com progresso 100% / total
-        const concluidas = matriculas.filter((m: { progresso: number }) => m.progresso === 100).length;
-        setTaxaConclusao(matriculas.length > 0 ? Math.round((concluidas / matriculas.length) * 100) : 0);
+        setReceita(receita);
       } finally {
         setLoading(false);
       }
@@ -49,13 +44,14 @@ export function SGCursos() {
     load();
   }, []);
 
-  const getNivel = (nivelId: number) => niveis.find(n => n.id === nivelId)?.nome ?? '-';
+  const getNivel = (nivelId: number) =>
+    niveis.find(n => n.id === nivelId)?.nome ?? '-';
 
   const kpis = [
-    { label: 'Total de matrículas', value: loading ? '—' : String(totalMatriculas),                  icon: 'bi-person-check',     color: 'var(--primary)' },
-    { label: 'Receita (assinaturas ativas)', value: loading ? '—' : `R$ ${receitaMensal.toFixed(2)}`,  icon: 'bi-currency-dollar',  color: 'var(--success)' },
-    { label: 'Cursos cadastrados',  value: loading ? '—' : String(cursos.length),                      icon: 'bi-mortarboard',      color: 'var(--info)' },
-    { label: 'Taxa de conclusão',   value: loading ? '—' : `${taxaConclusao}%`,                       icon: 'bi-trophy',           color: 'var(--warning)' },
+    { label: 'Cursos cadastrados',      value: loading ? '—' : String(cursos.length),           icon: 'bi-mortarboard',     color: 'var(--info)' },
+    { label: 'Assinaturas ativas',      value: loading ? '—' : String(assinaturasAtivas),        icon: 'bi-person-check',    color: 'var(--primary)' },
+    { label: 'Receita (assin. ativas)', value: loading ? '—' : `R$ ${receitaMensal.toFixed(2)}`, icon: 'bi-currency-dollar', color: 'var(--success)' },
+    { label: 'Certificados emitidos',   value: loading ? '—' : String(totalCerts),              icon: 'bi-patch-check',     color: 'var(--warning)' },
   ];
 
   return (
