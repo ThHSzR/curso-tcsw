@@ -1,7 +1,7 @@
 const BASE = 'http://localhost:3001';
 
 export interface Nivel {
-  id?: number;
+  id: number;
   nome: string;
 }
 
