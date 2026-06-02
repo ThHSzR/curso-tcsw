@@ -4,6 +4,29 @@ Aplicação frontend desenvolvida como parte do **LAB03**, com o objetivo de ger
 
 ---
 
+## ✅ Critérios de Avaliação
+
+| Critério | Status | Detalhes |
+|---------|--------|----------|
+| **Design e Usabilidade (Bootstrap)** | ✅ Atendido | Classes Bootstrap 5 em todos os formulários, tabelas, modais, cards e navegação |
+| **Estrutura do Projeto** | ✅ Atendido | Pastas `components/`, `models/`, `services/` e `pages/` devidamente organizadas |
+| **Roteamento** | ✅ Atendido | React Router configurado no `App.tsx` com rota dedicada para cada página |
+| **Consumo da API (JSON Server)** | ✅ Atendido | Todos os services consomem o JSON Server via `fetch` com GET, POST, PUT e DELETE |
+
+### Cobertura de Entidades
+
+Todas as **13 entidades** do modelo de dados do enunciado estão implementadas:
+
+| Módulo | Entidades |
+|--------|-----------|
+| **Core** | Usuários, Instrutores, Categorias, Níveis |
+| **Conteúdo** | Cursos, Módulos, Aulas |
+| **Interação** | Matrículas, Avaliações, Progresso de Aulas |
+| **Curadoria** | Trilhas, Trilhas\_Cursos, Certificados |
+| **Negócio** | Planos, Assinaturas, Pagamentos |
+
+---
+
 ## 🛠️ Stack
 
 | Tecnologia | Versão | Papel |
@@ -27,7 +50,8 @@ frontend/
 │   ├── components/
 │   │   ├── Header/               # Navbar + offcanvas
 │   │   ├── Modal/                # Modal reutilizável
-│   │   └── Toast/                # Notificação temporária
+│   │   ├── Toast/                # Notificação temporária
+│   │   └── SearchBox/            # Campo de busca com autocomplete
 │   ├── models/                   # Interfaces de modelos auxiliares
 │   ├── services/                 # Interfaces TypeScript + CRUD HTTP
 │   └── pages/                    # Telas CRUD da aplicação
@@ -148,6 +172,17 @@ npm run build   # ⚠️ sempre "npm run build", nunca "npm build"
   message="Curso criado com sucesso!"
   type="success"   // 'success' | 'error'
   onClose={() => setToast(null)}
+/>
+```
+
+### `<SearchBox />`
+
+```tsx
+<SearchBox
+  label="Usuário"
+  options={usuarios.map(u => ({ id: u.id, label: u.nome }))}
+  value={form.usuarioId}
+  onChange={(id) => setForm({ ...form, usuarioId: id })}
 />
 ```
 
