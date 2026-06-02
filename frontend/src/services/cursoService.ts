@@ -1,7 +1,7 @@
 const BASE = 'http://localhost:3001';
 
 export interface Curso {
-  id?: number;
+  id: number;
   nome: string;
   descricao: string;
   cargaHoraria: number;
@@ -22,7 +22,7 @@ export const cursoService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     }).then(r => r.json()),
-  update: (id: number, data: Partial<Curso>): Promise<Curso> =>
+  update: (id: number, data: Partial<Omit<Curso, 'id'>>): Promise<Curso> =>
     fetch(`${BASE}/cursos/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

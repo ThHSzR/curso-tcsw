@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { Nivel } from '../../models/nivel.model';
-
-const BASE = 'http://localhost:3001/niveis';
+import type { Nivel } from '../../services/nivelService';
+import { nivelService } from '../../services/nivelService';
 
 export function Niveis() {
   const [niveis, setNiveis] = useState<Nivel[]>([]);
@@ -11,7 +10,7 @@ export function Niveis() {
 
   const load = () => {
     setLoading(true);
-    fetch(BASE).then(r => r.json()).then(d => { setNiveis(d); setLoading(false); });
+    nivelService.getAll().then(d => { setNiveis(d); setLoading(false); });
   };
 
   useEffect(() => { load(); }, []);
@@ -19,20 +18,23 @@ export function Niveis() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editId !== null) {
-      await fetch(`${BASE}/${editId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      await nivelService.update(editId, form);
     } else {
-      await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      await nivelService.create(form);
     }
     setForm({ nome: '' });
     setEditId(null);
     load();
   };
 
-  const handleEdit = (n: Nivel) => { setForm({ nome: n.nome }); setEditId(n.id); };
+  const handleEdit = (n: Nivel) => {
+    setForm({ nome: n.nome });
+    setEditId(n.id);
+  };
 
   const handleDelete = async (id: number) => {
     if (!confirm('Excluir este nível?')) return;
-    await fetch(`${BASE}/${id}`, { method: 'DELETE' });
+    await nivelService.remove(id);
     load();
   };
 
@@ -52,7 +54,9 @@ export function Niveis() {
             </div>
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">{editId ? 'Salvar' : 'Adicionar'}</button>
-              {editId && <button type="button" className="btn btn-secondary" onClick={() => { setForm({ nome: '' }); setEditId(null); }}>Cancelar</button>}
+              {editId && (
+                <button type="button" className="btn btn-secondary" onClick={() => { setForm({ nome: '' }); setEditId(null); }}>Cancelar</button>
+              )}
             </div>
           </form>
         </div>
@@ -64,7 +68,9 @@ export function Niveis() {
         <div className="card">
           <div className="card-body p-0">
             <table className="table table-hover mb-0">
-              <thead><tr><th>#</th><th>Nome</th><th style={{ width: 120 }}>Ações</th></tr></thead>
+              <thead>
+                <tr><th>#</th><th>Nome</th><th style={{ width: 120 }}>Ações</th></tr>
+              </thead>
               <tbody>
                 {niveis.map(n => (
                   <tr key={n.id}>
@@ -76,7 +82,9 @@ export function Niveis() {
                     </td>
                   </tr>
                 ))}
-                {niveis.length === 0 && <tr><td colSpan={3} className="text-center text-muted py-4">Nenhum nível cadastrado.</td></tr>}
+                {niveis.length === 0 && (
+                  <tr><td colSpan={3} className="text-center text-muted py-4">Nenhum nível cadastrado.</td></tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { Instrutor } from '../../models/instrutor.model';
-
-const BASE = 'http://localhost:3001/instrutores';
+import type { Instrutor } from '../../services/instrutorService';
+import { instrutorService } from '../../services/instrutorService';
 
 export function Instrutores() {
   const [instrutores, setInstrutores] = useState<Instrutor[]>([]);
@@ -11,7 +10,7 @@ export function Instrutores() {
 
   const load = () => {
     setLoading(true);
-    fetch(BASE).then(r => r.json()).then(d => { setInstrutores(d); setLoading(false); });
+    instrutorService.getAll().then(d => { setInstrutores(d); setLoading(false); });
   };
 
   useEffect(() => { load(); }, []);
@@ -19,20 +18,23 @@ export function Instrutores() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editId !== null) {
-      await fetch(`${BASE}/${editId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      await instrutorService.update(editId, form);
     } else {
-      await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      await instrutorService.create(form);
     }
     setForm({ nome: '', email: '', bio: '' });
     setEditId(null);
     load();
   };
 
-  const handleEdit = (i: Instrutor) => { setForm({ nome: i.nome, email: i.email, bio: i.bio }); setEditId(i.id!); };
+  const handleEdit = (i: Instrutor) => {
+    setForm({ nome: i.nome, email: i.email, bio: i.bio });
+    setEditId(i.id);
+  };
 
   const handleDelete = async (id: number) => {
     if (!confirm('Excluir este instrutor?')) return;
-    await fetch(`${BASE}/${id}`, { method: 'DELETE' });
+    await instrutorService.remove(id);
     load();
   };
 
@@ -62,7 +64,9 @@ export function Instrutores() {
             </div>
             <div className="d-flex gap-2 mt-3">
               <button type="submit" className="btn btn-primary">{editId ? 'Salvar' : 'Adicionar'}</button>
-              {editId && <button type="button" className="btn btn-secondary" onClick={() => { setForm({ nome: '', email: '', bio: '' }); setEditId(null); }}>Cancelar</button>}
+              {editId && (
+                <button type="button" className="btn btn-secondary" onClick={() => { setForm({ nome: '', email: '', bio: '' }); setEditId(null); }}>Cancelar</button>
+              )}
             </div>
           </form>
         </div>
@@ -74,7 +78,9 @@ export function Instrutores() {
         <div className="card">
           <div className="card-body p-0">
             <table className="table table-hover mb-0">
-              <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Bio</th><th style={{ width: 120 }}>Ações</th></tr></thead>
+              <thead>
+                <tr><th>#</th><th>Nome</th><th>E-mail</th><th>Bio</th><th style={{ width: 120 }}>Ações</th></tr>
+              </thead>
               <tbody>
                 {instrutores.map(i => (
                   <tr key={i.id}>
@@ -84,11 +90,13 @@ export function Instrutores() {
                     <td><span className="text-muted">{i.bio}</span></td>
                     <td>
                       <button className="btn btn-sm btn-outline-primary me-1" onClick={() => handleEdit(i)}><i className="bi bi-pencil" /></button>
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(i.id!)}><i className="bi bi-trash" /></button>
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(i.id)}><i className="bi bi-trash" /></button>
                     </td>
                   </tr>
                 ))}
-                {instrutores.length === 0 && <tr><td colSpan={5} className="text-center text-muted py-4">Nenhum instrutor cadastrado.</td></tr>}
+                {instrutores.length === 0 && (
+                  <tr><td colSpan={5} className="text-center text-muted py-4">Nenhum instrutor cadastrado.</td></tr>
+                )}
               </tbody>
             </table>
           </div>
