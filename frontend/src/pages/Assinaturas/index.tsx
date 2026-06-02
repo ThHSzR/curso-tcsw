@@ -3,18 +3,15 @@ import type { Assinatura, Plano } from '../../services/assinaturaService';
 import { assinaturaService, planoService } from '../../services/assinaturaService';
 import { usuarioService } from '../../services/usuarioService';
 import type { Usuario } from '../../services/usuarioService';
+import { SearchBox } from '../../components/SearchBox';
 
 export function Assinaturas() {
   const [assinaturas, setAssinaturas] = useState<Assinatura[]>([]);
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [planos, setPlanos] = useState<Plano[]>([]);
-  const [form, setForm] = useState<Omit<Assinatura, 'id'>>({
-    usuarioId: 0, planoId: 0,
-    dataInicio: new Date().toISOString().split('T')[0],
-    dataFim: '',
-  });
-  const [editId, setEditId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [usuarios, setUsuarios]       = useState<Usuario[]>([]);
+  const [planos, setPlanos]           = useState<Plano[]>([]);
+  const [form, setForm] = useState<Omit<Assinatura, 'id'>>({ usuarioId: 0, planoId: 0, dataInicio: new Date().toISOString().split('T')[0], dataFim: '' });
+  const [editId, setEditId]           = useState<number | null>(null);
+  const [loading, setLoading]         = useState(true);
 
   const load = () => {
     setLoading(true);
@@ -33,8 +30,7 @@ export function Assinaturas() {
   };
 
   const handlePlanoChange = (planoId: number) => {
-    const dataFim = calcDataFim(form.dataInicio, planoId);
-    setForm({ ...form, planoId, dataFim });
+    setForm(f => ({ ...f, planoId, dataFim: calcDataFim(f.dataInicio, planoId) }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +52,7 @@ export function Assinaturas() {
   };
 
   const nomeUsuario = (id: number) => usuarios.find(u => u.id === id)?.nomeCompleto ?? `#${id}`;
-  const nomePlano = (id: number) => planos.find(p => p.id === id)?.nome ?? `#${id}`;
+  const nomePlano   = (id: number) => planos.find(p => p.id === id)?.nome ?? `#${id}`;
 
   return (
     <div className="page-container">
@@ -68,11 +64,14 @@ export function Assinaturas() {
           <form onSubmit={handleSubmit}>
             <div className="row g-3">
               <div className="col-md-3">
-                <label className="form-label">Usuário</label>
-                <select className="form-select" value={form.usuarioId} onChange={e => setForm({ ...form, usuarioId: +e.target.value })} required>
-                  <option value={0}>Selecione...</option>
-                  {usuarios.map(u => <option key={u.id} value={u.id}>{u.nomeCompleto}</option>)}
-                </select>
+                <SearchBox
+                  label="Usuário"
+                  placeholder="Buscar usuário..."
+                  options={usuarios.map(u => ({ id: u.id!, label: u.nomeCompleto }))}
+                  value={form.usuarioId}
+                  onChange={id => setForm(f => ({ ...f, usuarioId: id }))}
+                  required
+                />
               </div>
               <div className="col-md-3">
                 <label className="form-label">Plano</label>
@@ -83,7 +82,8 @@ export function Assinaturas() {
               </div>
               <div className="col-md-3">
                 <label className="form-label">Data de Início</label>
-                <input type="date" className="form-control" value={form.dataInicio} onChange={e => setForm({ ...form, dataInicio: e.target.value, dataFim: calcDataFim(e.target.value, form.planoId) })} required />
+                <input type="date" className="form-control" value={form.dataInicio}
+                  onChange={e => setForm(f => ({ ...f, dataInicio: e.target.value, dataFim: calcDataFim(e.target.value, f.planoId) }))} required />
               </div>
               <div className="col-md-3">
                 <label className="form-label">Data de Fim</label>
@@ -92,7 +92,8 @@ export function Assinaturas() {
             </div>
             <div className="d-flex gap-2 mt-3">
               <button type="submit" className="btn btn-primary">{editId ? 'Salvar' : 'Assinar'}</button>
-              {editId && <button type="button" className="btn btn-secondary" onClick={() => { setForm({ usuarioId: 0, planoId: 0, dataInicio: new Date().toISOString().split('T')[0], dataFim: '' }); setEditId(null); }}>Cancelar</button>}
+              {editId && <button type="button" className="btn btn-secondary"
+                onClick={() => { setForm({ usuarioId: 0, planoId: 0, dataInicio: new Date().toISOString().split('T')[0], dataFim: '' }); setEditId(null); }}>Cancelar</button>}
             </div>
           </form>
         </div>
@@ -110,11 +111,8 @@ export function Assinaturas() {
               <tbody>
                 {assinaturas.map(a => (
                   <tr key={a.id}>
-                    <td>{a.id}</td>
-                    <td>{nomeUsuario(a.usuarioId)}</td>
-                    <td>{nomePlano(a.planoId)}</td>
-                    <td>{a.dataInicio}</td>
-                    <td>{a.dataFim}</td>
+                    <td>{a.id}</td><td>{nomeUsuario(a.usuarioId)}</td><td>{nomePlano(a.planoId)}</td>
+                    <td>{a.dataInicio}</td><td>{a.dataFim}</td>
                     <td>
                       <button className="btn btn-sm btn-outline-primary me-1" onClick={() => handleEdit(a)}><i className="bi bi-pencil" /></button>
                       <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(a.id)}><i className="bi bi-trash" /></button>

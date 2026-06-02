@@ -5,17 +5,18 @@ import { usuarioService } from '../../services/usuarioService';
 import type { Usuario } from '../../services/usuarioService';
 import { cursoService } from '../../services/cursoService';
 import type { Curso } from '../../services/cursoService';
+import { SearchBox } from '../../components/SearchBox';
 
 export function Matriculas() {
   const [matriculas, setMatriculas] = useState<Matricula[]>([]);
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [cursos, setCursos] = useState<Curso[]>([]);
+  const [usuarios, setUsuarios]     = useState<Usuario[]>([]);
+  const [cursos, setCursos]         = useState<Curso[]>([]);
   const [form, setForm] = useState<Omit<Matricula, 'id'>>({
     usuarioId: 0, cursoId: 0,
     dataMatricula: new Date().toISOString().split('T')[0],
     dataConclusao: null,
   });
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editId, setEditId]   = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = () => {
@@ -45,7 +46,7 @@ export function Matriculas() {
   };
 
   const nomeUsuario = (id: number) => usuarios.find(u => u.id === id)?.nomeCompleto ?? `#${id}`;
-  const nomeCurso = (id: number) => cursos.find(c => c.id === id)?.titulo ?? `#${id}`;
+  const nomeCurso   = (id: number) => cursos.find(c => c.id === id)?.titulo ?? `#${id}`;
 
   return (
     <div className="page-container">
@@ -57,31 +58,37 @@ export function Matriculas() {
           <form onSubmit={handleSubmit}>
             <div className="row g-3">
               <div className="col-md-3">
-                <label className="form-label">Usuário</label>
-                <select className="form-select" value={form.usuarioId} onChange={e => setForm({ ...form, usuarioId: +e.target.value })} required>
-                  <option value={0}>Selecione...</option>
-                  {usuarios.map(u => <option key={u.id} value={u.id}>{u.nomeCompleto}</option>)}
-                </select>
+                <SearchBox
+                  label="Usuário"
+                  placeholder="Buscar usuário..."
+                  options={usuarios.map(u => ({ id: u.id!, label: u.nomeCompleto }))}
+                  value={form.usuarioId}
+                  onChange={id => setForm(f => ({ ...f, usuarioId: id }))}
+                  required
+                />
               </div>
               <div className="col-md-3">
                 <label className="form-label">Curso</label>
-                <select className="form-select" value={form.cursoId} onChange={e => setForm({ ...form, cursoId: +e.target.value })} required>
+                <select className="form-select" value={form.cursoId} onChange={e => setForm(f => ({ ...f, cursoId: +e.target.value }))} required>
                   <option value={0}>Selecione...</option>
                   {cursos.map(c => <option key={c.id} value={c.id}>{c.titulo}</option>)}
                 </select>
               </div>
               <div className="col-md-3">
                 <label className="form-label">Data de Matrícula</label>
-                <input type="date" className="form-control" value={form.dataMatricula} onChange={e => setForm({ ...form, dataMatricula: e.target.value })} required />
+                <input type="date" className="form-control" value={form.dataMatricula}
+                  onChange={e => setForm(f => ({ ...f, dataMatricula: e.target.value }))} required />
               </div>
               <div className="col-md-3">
                 <label className="form-label">Data de Conclusão</label>
-                <input type="date" className="form-control" value={form.dataConclusao ?? ''} onChange={e => setForm({ ...form, dataConclusao: e.target.value || null })} />
+                <input type="date" className="form-control" value={form.dataConclusao ?? ''}
+                  onChange={e => setForm(f => ({ ...f, dataConclusao: e.target.value || null }))} />
               </div>
             </div>
             <div className="d-flex gap-2 mt-3">
               <button type="submit" className="btn btn-primary">{editId ? 'Salvar' : 'Matricular'}</button>
-              {editId && <button type="button" className="btn btn-secondary" onClick={() => { setForm({ usuarioId: 0, cursoId: 0, dataMatricula: new Date().toISOString().split('T')[0], dataConclusao: null }); setEditId(null); }}>Cancelar</button>}
+              {editId && <button type="button" className="btn btn-secondary"
+                onClick={() => { setForm({ usuarioId: 0, cursoId: 0, dataMatricula: new Date().toISOString().split('T')[0], dataConclusao: null }); setEditId(null); }}>Cancelar</button>}
             </div>
           </form>
         </div>
@@ -99,9 +106,7 @@ export function Matriculas() {
               <tbody>
                 {matriculas.map(m => (
                   <tr key={m.id}>
-                    <td>{m.id}</td>
-                    <td>{nomeUsuario(m.usuarioId)}</td>
-                    <td>{nomeCurso(m.cursoId)}</td>
+                    <td>{m.id}</td><td>{nomeUsuario(m.usuarioId)}</td><td>{nomeCurso(m.cursoId)}</td>
                     <td>{m.dataMatricula}</td>
                     <td>{m.dataConclusao ?? <span className="badge bg-secondary">Em andamento</span>}</td>
                     <td>
