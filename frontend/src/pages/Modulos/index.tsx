@@ -12,7 +12,7 @@ export function Modulos() {
   const [search, setSearch]     = useState('');
   const [modal, setModal]       = useState<'add'|'edit'|'del'|null>(null);
   const [selected, setSelected] = useState<Modulo|null>(null);
-  const [form, setForm]         = useState({ titulo:'', descricao:'', ordem:1, cursoId:0 });
+  const [form, setForm]         = useState({ titulo:'', ordem:1, cursoId:0 });
   const [toast, setToast]       = useState<{msg:string;type:'success'|'error'}|null>(null);
   const [loading, setLoading]   = useState(true);
 
@@ -24,8 +24,8 @@ export function Modulos() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd  = () => { setForm({ titulo:'', descricao:'', ordem:1, cursoId: cursos[0]?.id??0 }); setModal('add'); };
-  const openEdit = (m: Modulo) => { setSelected(m); setForm({ titulo:m.titulo, descricao:m.descricao, ordem:m.ordem, cursoId:m.cursoId }); setModal('edit'); };
+  const openAdd  = () => { setForm({ titulo:'', ordem:1, cursoId: cursos[0]?.id??0 }); setModal('add'); };
+  const openEdit = (m: Modulo) => { setSelected(m); setForm({ titulo:m.titulo, ordem:m.ordem, cursoId:m.cursoId }); setModal('edit'); };
   const openDel  = (m: Modulo) => { setSelected(m); setModal('del'); };
 
   const save = async () => {
@@ -83,7 +83,6 @@ export function Modulos() {
       {(modal==='add'||modal==='edit') && (
         <Modal title={modal==='add'?'Novo Módulo':'Editar Módulo'} onClose={()=>setModal(null)} onConfirm={save}>
           <div className="field"><label>Título</label><input className="input" value={form.titulo} onChange={e=>setForm(f=>({...f,titulo:e.target.value}))} /></div>
-          <div className="field"><label>Descrição</label><textarea className="textarea" value={form.descricao} onChange={e=>setForm(f=>({...f,descricao:e.target.value}))} /></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
             <div className="field"><label>Ordem</label><input className="input" type="number" min={1} value={form.ordem} onChange={e=>setForm(f=>({...f,ordem:+e.target.value}))} /></div>
             <div className="field"><label>Curso</label><select className="select" value={form.cursoId} onChange={e=>setForm(f=>({...f,cursoId:+e.target.value}))}>{cursos.map(c=><option key={c.id} value={c.id}>{c.titulo}</option>)}</select></div>

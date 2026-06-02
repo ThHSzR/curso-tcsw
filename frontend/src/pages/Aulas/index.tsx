@@ -12,7 +12,7 @@ export function Aulas() {
   const [search, setSearch]     = useState('');
   const [modal, setModal]       = useState<'add'|'edit'|'del'|null>(null);
   const [selected, setSelected] = useState<Aula|null>(null);
-  const [form, setForm]         = useState({ titulo:'', tipoConteudo:'video' as Aula['tipoConteudo'], urlConteudo:'', duracaoMinutos:0, ordem:1, moduloId:0 });
+  const [form, setForm]         = useState({ titulo:'', tipoConteudo:'Video' as Aula['tipoConteudo'], urlConteudo:'', duracaoMinutos:0, ordem:1, moduloId:0 });
   const [toast, setToast]       = useState<{msg:string;type:'success'|'error'}|null>(null);
   const [loading, setLoading]   = useState(true);
 
@@ -24,7 +24,7 @@ export function Aulas() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd  = () => { setForm({ titulo:'', tipoConteudo:'video', urlConteudo:'', duracaoMinutos:0, ordem:1, moduloId: modulos[0]?.id??0 }); setModal('add'); };
+  const openAdd  = () => { setForm({ titulo:'', tipoConteudo:'Video', urlConteudo:'', duracaoMinutos:0, ordem:1, moduloId: modulos[0]?.id??0 }); setModal('add'); };
   const openEdit = (a: Aula) => { setSelected(a); setForm({ titulo:a.titulo, tipoConteudo:a.tipoConteudo, urlConteudo:a.urlConteudo, duracaoMinutos:a.duracaoMinutos, ordem:a.ordem, moduloId:a.moduloId }); setModal('edit'); };
   const openDel  = (a: Aula) => { setSelected(a); setModal('del'); };
 
@@ -44,8 +44,8 @@ export function Aulas() {
 
   const filtered = items.filter(i => i.titulo.toLowerCase().includes(search.toLowerCase()));
   const getMod   = (id:number) => modulos.find(m=>m.id===id)?.titulo ?? '-';
-  const tipoBadge = (t:string) => t==='video'?'badge-danger':t==='texto'?'badge-info':'badge-warning';
-  const tipoIcon  = (t:string) => t==='video'?'bi-play-fill':t==='texto'?'bi-file-text':'bi-question-circle';
+  const tipoBadge = (t:string) => t==='Video'?'badge-danger':t==='Texto'?'badge-info':'badge-warning';
+  const tipoIcon  = (t:string) => t==='Video'?'bi-play-fill':t==='Texto'?'bi-file-text':'bi-question-circle';
 
   return (
     <div className="page">
@@ -90,7 +90,7 @@ export function Aulas() {
           <div className="field"><label>URL do Conteúdo</label><input className="input" value={form.urlConteudo} onChange={e=>setForm(f=>({...f,urlConteudo:e.target.value}))} placeholder="https://..." /></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
             <div className="field"><label>Tipo</label><select className="select" value={form.tipoConteudo} onChange={e=>setForm(f=>({...f,tipoConteudo:e.target.value as Aula['tipoConteudo']}))}>
-              <option value="video">Vídeo</option><option value="texto">Texto</option><option value="quiz">Quiz</option>
+              <option value="Video">Vídeo</option><option value="Texto">Texto</option><option value="Quiz">Quiz</option>
             </select></div>
             <div className="field"><label>Duração (min)</label><input className="input" type="number" value={form.duracaoMinutos} onChange={e=>setForm(f=>({...f,duracaoMinutos:+e.target.value}))} /></div>
             <div className="field"><label>Ordem</label><input className="input" type="number" min={1} value={form.ordem} onChange={e=>setForm(f=>({...f,ordem:+e.target.value}))} /></div>
