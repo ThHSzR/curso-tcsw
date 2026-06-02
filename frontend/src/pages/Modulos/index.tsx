@@ -12,7 +12,7 @@ export function Modulos() {
   const [search, setSearch]     = useState('');
   const [modal, setModal]       = useState<'add'|'edit'|'del'|null>(null);
   const [selected, setSelected] = useState<Modulo|null>(null);
-  const [form, setForm]         = useState({ nome:'', descricao:'', ordem:1, cursoId:0 });
+  const [form, setForm]         = useState({ titulo:'', descricao:'', ordem:1, cursoId:0 });
   const [toast, setToast]       = useState<{msg:string;type:'success'|'error'}|null>(null);
   const [loading, setLoading]   = useState(true);
 
@@ -24,8 +24,8 @@ export function Modulos() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd  = () => { setForm({ nome:'', descricao:'', ordem:1, cursoId: cursos[0]?.id??0 }); setModal('add'); };
-  const openEdit = (m: Modulo) => { setSelected(m); setForm({ nome:m.nome, descricao:m.descricao, ordem:m.ordem, cursoId:m.cursoId }); setModal('edit'); };
+  const openAdd  = () => { setForm({ titulo:'', descricao:'', ordem:1, cursoId: cursos[0]?.id??0 }); setModal('add'); };
+  const openEdit = (m: Modulo) => { setSelected(m); setForm({ titulo:m.titulo, descricao:m.descricao, ordem:m.ordem, cursoId:m.cursoId }); setModal('edit'); };
   const openDel  = (m: Modulo) => { setSelected(m); setModal('del'); };
 
   const save = async () => {
@@ -42,8 +42,8 @@ export function Modulos() {
     catch { setToast({ msg:'Erro ao remover', type:'error' }); }
   };
 
-  const filtered  = items.filter(i => i.nome.toLowerCase().includes(search.toLowerCase()));
-  const getCurso  = (id:number) => cursos.find(c=>c.id===id)?.nome ?? '-';
+  const filtered  = items.filter(i => i.titulo.toLowerCase().includes(search.toLowerCase()));
+  const getCurso  = (id:number) => cursos.find(c=>c.id===id)?.titulo ?? '-';
 
   return (
     <div className="page">
@@ -60,14 +60,14 @@ export function Modulos() {
           </div>
         </div>
         <table>
-          <thead><tr><th>#</th><th>Nome</th><th>Curso</th><th>Ordem</th><th>Ações</th></tr></thead>
+          <thead><tr><th>#</th><th>Título</th><th>Curso</th><th>Ordem</th><th>Ações</th></tr></thead>
           <tbody>
             {loading ? <tr><td colSpan={5} className="table-empty"><i className="bi bi-arrow-repeat"></i><p>Carregando...</p></td></tr>
             : filtered.length===0 ? <tr><td colSpan={5} className="table-empty"><i className="bi bi-inbox"></i><p>Nenhum módulo</p></td></tr>
             : filtered.map(m => (
               <tr key={m.id}>
                 <td className="td-muted">{m.id}</td>
-                <td style={{fontWeight:500}}>{m.nome}</td>
+                <td style={{fontWeight:500}}>{m.titulo}</td>
                 <td className="td-muted">{getCurso(m.cursoId)}</td>
                 <td><span className="badge badge-muted">#{m.ordem}</span></td>
                 <td><div className="table-actions">
@@ -82,18 +82,18 @@ export function Modulos() {
 
       {(modal==='add'||modal==='edit') && (
         <Modal title={modal==='add'?'Novo Módulo':'Editar Módulo'} onClose={()=>setModal(null)} onConfirm={save}>
-          <div className="field"><label>Nome</label><input className="input" value={form.nome} onChange={e=>setForm(f=>({...f,nome:e.target.value}))} /></div>
+          <div className="field"><label>Título</label><input className="input" value={form.titulo} onChange={e=>setForm(f=>({...f,titulo:e.target.value}))} /></div>
           <div className="field"><label>Descrição</label><textarea className="textarea" value={form.descricao} onChange={e=>setForm(f=>({...f,descricao:e.target.value}))} /></div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
             <div className="field"><label>Ordem</label><input className="input" type="number" min={1} value={form.ordem} onChange={e=>setForm(f=>({...f,ordem:+e.target.value}))} /></div>
-            <div className="field"><label>Curso</label><select className="select" value={form.cursoId} onChange={e=>setForm(f=>({...f,cursoId:+e.target.value}))}>{cursos.map(c=><option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
+            <div className="field"><label>Curso</label><select className="select" value={form.cursoId} onChange={e=>setForm(f=>({...f,cursoId:+e.target.value}))}>{cursos.map(c=><option key={c.id} value={c.id}>{c.titulo}</option>)}</select></div>
           </div>
         </Modal>
       )}
 
       {modal==='del' && (
         <Modal title="Confirmar exclusão" onClose={()=>setModal(null)} onConfirm={del} confirmLabel="Excluir" confirmClass="btn btn-danger">
-          <p style={{color:'var(--text-muted)'}}>Excluir o módulo <strong style={{color:'var(--text)'}}>{selected?.nome}</strong>?</p>
+          <p style={{color:'var(--text-muted)'}}>Excluir o módulo <strong style={{color:'var(--text)'}}>{selected?.titulo}</strong>?</p>
         </Modal>
       )}
 

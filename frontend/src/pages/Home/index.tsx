@@ -7,6 +7,7 @@ import { aulaService }        from '../../services/aulaService';
 import { usuarioService }     from '../../services/usuarioService';
 import { certificadoService } from '../../services/certificadoService';
 import { assinaturaService }  from '../../services/assinaturaService';
+import type { Assinatura }    from '../../services/assinaturaService';
 
 interface Stats {
   trilhas:      number;
@@ -52,7 +53,9 @@ export function Home() {
           aulas:             aulas.length,
           usuarios:          usuarios.length,
           certificados:      certificados.length,
-          assinaturasAtivas: assinaturas.filter((a: { status: string }) => a.status === 'ativa').length,
+          assinaturasAtivas: (assinaturas as Assinatura[]).filter(
+            a => (a as unknown as { status: string }).status === 'ativa'
+          ).length,
         });
       } finally {
         setLoading(false);

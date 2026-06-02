@@ -4,32 +4,28 @@ import type { Curso }                        from '../../services/cursoService';
 import { assinaturaService, planoService }   from '../../services/assinaturaService';
 import type { Assinatura, Plano }            from '../../services/assinaturaService';
 import { certificadoService }               from '../../services/certificadoService';
-import { nivelService }                     from '../../services/nivelService';
 
 export function SGCursos() {
   const [cursos, setCursos]           = useState<Curso[]>([]);
   const [receitaMensal, setReceita]   = useState(0);
   const [assinaturasAtivas, setAtivas] = useState(0);
   const [totalCerts, setTotalCerts]   = useState(0);
-  const [niveis, setNiveis]           = useState<{ id: number; nome: string }[]>([]);
   const [loading, setLoading]         = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [cs, assinaturas, planos, certs, nvs] = await Promise.all([
+        const [cs, assinaturas, planos, certs] = await Promise.all([
           cursoService.getAll(),
           assinaturaService.getAll(),
           planoService.getAll(),
           certificadoService.getAll(),
-          nivelService.getAll(),
         ]);
 
         setCursos(cs);
-        setNiveis(nvs);
         setTotalCerts(certs.length);
 
-        const ativas = (assinaturas as Assinatura[]).filter(a => a.status === 'ativa');
+        const ativas = (assinaturas as Assinatura[]).filter(a => (a as unknown as { status: string }).status === 'ativa');
         setAtivas(ativas.length);
 
         const receita = ativas.reduce((acc, a) => {
@@ -44,8 +40,7 @@ export function SGCursos() {
     load();
   }, []);
 
-  const getNivel = (nivelId: number) =>
-    niveis.find(n => n.id === nivelId)?.nome ?? '-';
+  const nivelColor = (n: string) => n === 'Iniciante' ? 'badge-success' : n === 'Intermediário' ? 'badge-warning' : 'badge-danger';
 
   const kpis = [
     { label: 'Cursos cadastrados',      value: loading ? '—' : String(cursos.length),           icon: 'bi-mortarboard',     color: 'var(--info)' },
@@ -87,7 +82,7 @@ export function SGCursos() {
           <thead>
             <tr>
               <th>Curso</th>
-              <th>Carga Horária</th>
+              <th>Horas</th>
               <th>Nível</th>
             </tr>
           </thead>
@@ -98,9 +93,9 @@ export function SGCursos() {
                 ? <tr><td colSpan={3} className="table-empty"><i className="bi bi-inbox"></i><p>Nenhum curso</p></td></tr>
                 : cursos.map(c => (
                   <tr key={c.id}>
-                    <td style={{ fontWeight: 500 }}>{c.nome}</td>
-                    <td className="td-muted">{c.cargaHoraria}h</td>
-                    <td><span className="badge badge-muted">{getNivel(c.nivelId)}</span></td>
+                    <td style={{ fontWeight: 500 }}>{c.titulo}</td>
+                    <td className="td-muted">{c.totalHoras}h</td>
+                    <td><span className={`badge ${nivelColor(c.nivel)}`}>{c.nivel}</span></td>
                   </tr>
                 ))
             }

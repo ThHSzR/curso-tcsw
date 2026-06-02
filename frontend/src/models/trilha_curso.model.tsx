@@ -1,8 +1,11 @@
-import type { ICurso } from "./curso.model";
-import type { ITrilha } from "./trilha.model";
+import type { Curso } from "./curso.model";
+import type { Trilha } from "./trilha.model";
 
-export interface ITrilhaCurso{
-    trilha: ITrilha;
-    curso: ICurso;
-    ordem: number;
+export interface TrilhaCurso {
+  id?: number;
+  trilhaId: number;
+  cursoId: number;
+  ordem: number;
+  trilha?: Trilha;
+  curso?: Curso;
 }

@@ -12,7 +12,7 @@ export function Trilhas() {
   const [search, setSearch]       = useState('');
   const [modal, setModal]         = useState<'add'|'edit'|'del'|null>(null);
   const [selected, setSelected]   = useState<Trilha | null>(null);
-  const [form, setForm]           = useState({ nome:'', descricao:'', categoriaId:0 });
+  const [form, setForm]           = useState({ titulo:'', descricao:'', categoriaId:0 });
   const [toast, setToast]         = useState<{msg:string;type:'success'|'error'}|null>(null);
   const [loading, setLoading]     = useState(true);
 
@@ -24,8 +24,8 @@ export function Trilhas() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd  = () => { setForm({ nome:'', descricao:'', categoriaId: cats[0]?.id ?? 0 }); setModal('add'); };
-  const openEdit = (t: Trilha) => { setSelected(t); setForm({ nome: t.nome, descricao: t.descricao, categoriaId: t.categoriaId }); setModal('edit'); };
+  const openAdd  = () => { setForm({ titulo:'', descricao:'', categoriaId: cats[0]?.id ?? 0 }); setModal('add'); };
+  const openEdit = (t: Trilha) => { setSelected(t); setForm({ titulo: t.titulo, descricao: t.descricao, categoriaId: t.categoriaId }); setModal('edit'); };
   const openDel  = (t: Trilha) => { setSelected(t); setModal('del'); };
 
   const save = async () => {
@@ -45,7 +45,7 @@ export function Trilhas() {
     } catch { setToast({ msg: 'Erro ao remover', type: 'error' }); }
   };
 
-  const filtered = items.filter(i => i.nome.toLowerCase().includes(search.toLowerCase()));
+  const filtered = items.filter(i => i.titulo.toLowerCase().includes(search.toLowerCase()));
   const getCat   = (id: number) => cats.find(c => c.id === id)?.nome ?? '-';
 
   return (
@@ -69,7 +69,7 @@ export function Trilhas() {
           </div>
         </div>
         <table>
-          <thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th>Categoria</th><th>Ações</th></tr></thead>
+          <thead><tr><th>#</th><th>Título</th><th>Descrição</th><th>Categoria</th><th>Ações</th></tr></thead>
           <tbody>
             {loading ? (
               <tr><td colSpan={5} className="table-empty"><i className="bi bi-arrow-repeat"></i><p>Carregando...</p></td></tr>
@@ -78,7 +78,7 @@ export function Trilhas() {
             ) : filtered.map(t => (
               <tr key={t.id}>
                 <td className="td-muted">{t.id}</td>
-                <td style={{ fontWeight: 500 }}>{t.nome}</td>
+                <td style={{ fontWeight: 500 }}>{t.titulo}</td>
                 <td className="td-muted">{t.descricao}</td>
                 <td><span className="badge badge-primary">{getCat(t.categoriaId)}</span></td>
                 <td>
@@ -95,7 +95,7 @@ export function Trilhas() {
 
       {(modal === 'add' || modal === 'edit') && (
         <Modal title={modal === 'add' ? 'Nova Trilha' : 'Editar Trilha'} onClose={() => setModal(null)} onConfirm={save}>
-          <div className="field"><label>Nome</label><input className="input" value={form.nome} onChange={e => setForm(f=>({...f,nome:e.target.value}))} placeholder="Nome da trilha" /></div>
+          <div className="field"><label>Título</label><input className="input" value={form.titulo} onChange={e => setForm(f=>({...f,titulo:e.target.value}))} placeholder="Título da trilha" /></div>
           <div className="field"><label>Descrição</label><textarea className="textarea" value={form.descricao} onChange={e => setForm(f=>({...f,descricao:e.target.value}))} placeholder="Descrição" /></div>
           <div className="field"><label>Categoria</label>
             <select className="select" value={form.categoriaId} onChange={e => setForm(f=>({...f,categoriaId:+e.target.value}))}>
@@ -107,7 +107,7 @@ export function Trilhas() {
 
       {modal === 'del' && (
         <Modal title="Confirmar exclusão" onClose={() => setModal(null)} onConfirm={del} confirmLabel="Excluir" confirmClass="btn btn-danger">
-          <p style={{ color:'var(--text-muted)' }}>Tem certeza que deseja excluir a trilha <strong style={{color:'var(--text)'}}>{selected?.nome}</strong>?</p>
+          <p style={{ color:'var(--text-muted)' }}>Tem certeza que deseja excluir a trilha <strong style={{color:'var(--text)'}}>{selected?.titulo}</strong>?</p>
         </Modal>
       )}
 

@@ -1,9 +1,12 @@
-import type { IAula } from "./aula.model";
-import type { IUsuario } from "./usuario.model";
+import type { Aula } from "./aula.model";
+import type { Usuario } from "./usuario.model";
 
-export interface IProgressoAula{
-    usuario: IUsuario;
-    aula: IAula;
-    dataConclusao: Date;
-    status: "CONCLUIDO" | "EM PROGRESSO" | "NAO INICIADO"
+export interface ProgressoAula {
+  id?: number;
+  usuarioId: number;
+  aulaId: number;
+  dataConclusao: string | null;
+  status: 'pendente' | 'concluida';
+  usuario?: Usuario;
+  aula?: Aula;
 }
