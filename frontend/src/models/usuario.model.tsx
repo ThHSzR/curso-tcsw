@@ -1,9 +1,7 @@
-export interface IUsuario{
-    id? : string;
-    nome: string;
-    email: string;
-    perfil: "administrador" | "instrutor" | "aluno";
-    senhaHash: string;
-    dataCriacao: Date;
-    dataAlteracao: Date;
+export interface Usuario {
+  id: number;
+  nomeCompleto: string;
+  email: string;
+  senhaHash: string;
+  dataCadastro: string;
 }

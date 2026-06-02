@@ -1,6 +1,7 @@
 export interface Plano {
-  id?: number;
+  id: number;
   nome: string;
-  preco: number;
   descricao: string;
+  preco: number;
+  duracaoMeses: number;
 }

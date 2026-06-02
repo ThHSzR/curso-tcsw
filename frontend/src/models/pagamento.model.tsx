@@ -1,9 +1,8 @@
 export interface Pagamento {
-  id?: number;
-  usuarioId: number;
+  id: number;
   assinaturaId: number;
-  valor: number;
-  metodo: string;
-  status: string;
+  valorPago: number;
   dataPagamento: string;
+  metodoPagamento: string;
+  idTransacaoGateway: string;
 }

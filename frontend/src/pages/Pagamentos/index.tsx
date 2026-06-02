@@ -1,128 +1,135 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Modal }  from '../../components/Modal';
-import { Toast }  from '../../components/Toast';
+import { useEffect, useState } from 'react';
+import type { Pagamento } from '../../services/pagamentoService';
 import { pagamentoService } from '../../services/pagamentoService';
-import type { Pagamento }   from '../../services/pagamentoService';
-import { usuarioService }   from '../../services/usuarioService';
-import type { Usuario }     from '../../services/usuarioService';
 import { assinaturaService } from '../../services/assinaturaService';
-import type { Assinatura }   from '../../services/assinaturaService';
+import type { Assinatura } from '../../services/assinaturaService';
+
+const METODOS = ['Cartão de Crédito', 'Cartão de Débito', 'Boleto', 'PIX'];
+
+function gerarTransacao() {
+  return 'TXN-' + new Date().getFullYear() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
 
 export function Pagamentos() {
-  const [items, setItems]           = useState<Pagamento[]>([]);
-  const [usuarios, setUsuarios]     = useState<Usuario[]>([]);
+  const [pagamentos, setPagamentos] = useState<Pagamento[]>([]);
   const [assinaturas, setAssinaturas] = useState<Assinatura[]>([]);
-  const [search, setSearch]         = useState('');
-  const [modal, setModal]           = useState<'add'|'del'|null>(null);
-  const [selected, setSelected]     = useState<Pagamento|null>(null);
-  const [form, setForm]             = useState({ usuarioId: 0, assinaturaId: 0, valor: 0, metodo: 'pix' as Pagamento['metodo'], status: 'pendente' as Pagamento['status'], dataPagamento: '' });
-  const [toast, setToast]           = useState<{msg:string;type:'success'|'error'}|null>(null);
-  const [loading, setLoading]       = useState(true);
+  const [form, setForm] = useState<Omit<Pagamento, 'id'>>({
+    assinaturaId: 0,
+    valorPago: 0,
+    dataPagamento: new Date().toISOString().split('T')[0],
+    metodoPagamento: 'PIX',
+    idTransacaoGateway: gerarTransacao(),
+  });
+  const [editId, setEditId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
+  const load = () => {
     setLoading(true);
-    const [p, u, a] = await Promise.all([pagamentoService.getAll(), usuarioService.getAll(), assinaturaService.getAll()]);
-    setItems(p); setUsuarios(u); setAssinaturas(a); setLoading(false);
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  const getUser      = (id: number) => usuarios.find(u => u.id === id)?.nome ?? '-';
-  const getAssinatura = (id: number) => { const a = assinaturas.find(a => a.id === id); return a ? `#${a.id} - ${a.status}` : '-'; };
-  const statusBadge  = (s: string) => s === 'aprovado' ? 'badge-success' : s === 'recusado' ? 'badge-danger' : 'badge-warning';
-  const metodoBadge  = (m: string) => m === 'pix' ? 'badge-success' : m === 'cartao' ? 'badge-muted' : 'badge-warning';
-
-  const openAdd  = () => { setForm({ usuarioId: usuarios[0]?.id ?? 0, assinaturaId: assinaturas[0]?.id ?? 0, valor: 0, metodo: 'pix', status: 'pendente', dataPagamento: new Date().toISOString().slice(0,10) }); setModal('add'); };
-  const openDel  = (p: Pagamento) => { setSelected(p); setModal('del'); };
-
-  const save = async () => {
-    try { await pagamentoService.create(form); await load(); setModal(null); setToast({ msg: 'Pagamento registrado!', type: 'success' }); }
-    catch { setToast({ msg: 'Erro ao registrar', type: 'error' }); }
+    Promise.all([pagamentoService.getAll(), assinaturaService.getAll()]).then(([p, a]) => {
+      setPagamentos(p);
+      setAssinaturas(a);
+      setLoading(false);
+    });
   };
 
-  const del = async () => {
-    try { await pagamentoService.remove(selected!.id!); await load(); setModal(null); setToast({ msg: 'Pagamento removido', type: 'success' }); }
-    catch { setToast({ msg: 'Erro ao remover', type: 'error' }); }
+  useEffect(() => { load(); }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editId !== null) {
+      await pagamentoService.update(editId, form);
+    } else {
+      await pagamentoService.create({ ...form, idTransacaoGateway: gerarTransacao() });
+    }
+    setForm({ assinaturaId: 0, valorPago: 0, dataPagamento: new Date().toISOString().split('T')[0], metodoPagamento: 'PIX', idTransacaoGateway: gerarTransacao() });
+    setEditId(null);
+    load();
   };
 
-  const filtered = items.filter(i => getUser(i.usuarioId).toLowerCase().includes(search.toLowerCase()));
+  const handleEdit = (p: Pagamento) => {
+    setForm({ assinaturaId: p.assinaturaId, valorPago: p.valorPago, dataPagamento: p.dataPagamento, metodoPagamento: p.metodoPagamento, idTransacaoGateway: p.idTransacaoGateway });
+    setEditId(p.id);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Excluir este pagamento?')) return;
+    await pagamentoService.remove(id);
+    load();
+  };
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <div><h1 className="page-title">Pagamentos</h1><p className="page-subtitle">{items.length} pagamentos registrados</p></div>
-        <button className="btn btn-primary" onClick={openAdd}><i className="bi bi-plus-lg"></i> Registrar Pagamento</button>
+    <div className="page-container">
+      <div className="page-header"><h2>Pagamentos</h2></div>
+
+      <div className="card mb-4">
+        <div className="card-body">
+          <h5 className="card-title mb-3">{editId ? 'Editar Pagamento' : 'Registrar Pagamento'}</h5>
+          <form onSubmit={handleSubmit}>
+            <div className="row g-3">
+              <div className="col-md-3">
+                <label className="form-label">Assinatura</label>
+                <select className="form-select" value={form.assinaturaId} onChange={e => setForm({ ...form, assinaturaId: +e.target.value })} required>
+                  <option value={0}>Selecione...</option>
+                  {assinaturas.map(a => <option key={a.id} value={a.id}>Assinatura #{a.id} — Usuário {a.usuarioId}</option>)}
+                </select>
+              </div>
+              <div className="col-md-2">
+                <label className="form-label">Valor Pago (R$)</label>
+                <input type="number" step="0.01" className="form-control" value={form.valorPago} onChange={e => setForm({ ...form, valorPago: +e.target.value })} required />
+              </div>
+              <div className="col-md-3">
+                <label className="form-label">Método de Pagamento</label>
+                <select className="form-select" value={form.metodoPagamento} onChange={e => setForm({ ...form, metodoPagamento: e.target.value })}>
+                  {METODOS.map(m => <option key={m}>{m}</option>)}
+                </select>
+              </div>
+              <div className="col-md-2">
+                <label className="form-label">Data</label>
+                <input type="date" className="form-control" value={form.dataPagamento} onChange={e => setForm({ ...form, dataPagamento: e.target.value })} required />
+              </div>
+              <div className="col-md-2">
+                <label className="form-label">ID Transação</label>
+                <input className="form-control" value={form.idTransacaoGateway} readOnly />
+              </div>
+            </div>
+            <div className="d-flex gap-2 mt-3">
+              <button type="submit" className="btn btn-primary">{editId ? 'Salvar' : 'Registrar'}</button>
+              {editId && <button type="button" className="btn btn-secondary" onClick={() => { setForm({ assinaturaId: 0, valorPago: 0, dataPagamento: new Date().toISOString().split('T')[0], metodoPagamento: 'PIX', idTransacaoGateway: gerarTransacao() }); setEditId(null); }}>Cancelar</button>}
+            </div>
+          </form>
+        </div>
       </div>
 
-      <div className="table-wrapper">
-        <div className="table-toolbar">
-          <span className="table-toolbar-title">Histórico de pagamentos</span>
-          <div className="table-toolbar-right">
-            <div className="search-input"><i className="bi bi-search"></i><input placeholder="Buscar usuário..." value={search} onChange={e => setSearch(e.target.value)} /></div>
+      {loading ? (
+        <div className="text-center py-4"><div className="spinner-border text-primary" /></div>
+      ) : (
+        <div className="card">
+          <div className="card-body p-0">
+            <table className="table table-hover mb-0">
+              <thead>
+                <tr><th>#</th><th>Assinatura</th><th>Valor</th><th>Método</th><th>Data</th><th>ID Transação</th><th style={{ width: 100 }}>Ações</th></tr>
+              </thead>
+              <tbody>
+                {pagamentos.map(p => (
+                  <tr key={p.id}>
+                    <td>{p.id}</td>
+                    <td>#{p.assinaturaId}</td>
+                    <td>R$ {p.valorPago.toFixed(2)}</td>
+                    <td>{p.metodoPagamento}</td>
+                    <td>{p.dataPagamento}</td>
+                    <td><code>{p.idTransacaoGateway}</code></td>
+                    <td>
+                      <button className="btn btn-sm btn-outline-primary me-1" onClick={() => handleEdit(p)}><i className="bi bi-pencil" /></button>
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(p.id)}><i className="bi bi-trash" /></button>
+                    </td>
+                  </tr>
+                ))}
+                {pagamentos.length === 0 && <tr><td colSpan={7} className="text-center text-muted py-4">Nenhum pagamento registrado.</td></tr>}
+              </tbody>
+            </table>
           </div>
         </div>
-        <table>
-          <thead><tr><th>#</th><th>Usuário</th><th>Assinatura</th><th>Valor</th><th>Método</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead>
-          <tbody>
-            {loading
-              ? <tr><td colSpan={8} className="table-empty"><i className="bi bi-arrow-repeat"></i><p>Carregando...</p></td></tr>
-              : filtered.length === 0
-              ? <tr><td colSpan={8} className="table-empty"><i className="bi bi-inbox"></i><p>Nenhum pagamento</p></td></tr>
-              : filtered.map(p => (
-                <tr key={p.id}>
-                  <td className="td-muted">{p.id}</td>
-                  <td style={{ fontWeight: 500 }}>{getUser(p.usuarioId)}</td>
-                  <td className="td-muted">{getAssinatura(p.assinaturaId)}</td>
-                  <td>R$ {p.valor?.toFixed(2)}</td>
-                  <td><span className={`badge ${metodoBadge(p.metodo)}`}>{p.metodo}</span></td>
-                  <td><span className={`badge ${statusBadge(p.status)}`}>{p.status}</span></td>
-                  <td className="td-muted">{p.dataPagamento}</td>
-                  <td><button className="btn btn-danger btn-icon btn-sm" onClick={() => openDel(p)}><i className="bi bi-trash3"></i></button></td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
-
-      {modal === 'add' && (
-        <Modal title="Registrar Pagamento" onClose={() => setModal(null)} onConfirm={save}>
-          <div className="field"><label>Usuário</label>
-            <select className="select" value={form.usuarioId} onChange={e => setForm(f => ({ ...f, usuarioId: +e.target.value }))}>
-              {usuarios.map(u => <option key={u.id} value={u.id}>{u.nome}</option>)}
-            </select>
-          </div>
-          <div className="field"><label>Assinatura</label>
-            <select className="select" value={form.assinaturaId} onChange={e => setForm(f => ({ ...f, assinaturaId: +e.target.value }))}>
-              {assinaturas.map(a => <option key={a.id} value={a.id}>#{a.id} — {a.status}</option>)}
-            </select>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div className="field"><label>Valor (R$)</label><input className="input" type="number" step="0.01" value={form.valor} onChange={e => setForm(f => ({ ...f, valor: +e.target.value }))} /></div>
-            <div className="field"><label>Data</label><input className="input" type="date" value={form.dataPagamento} onChange={e => setForm(f => ({ ...f, dataPagamento: e.target.value }))} /></div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div className="field"><label>Método</label>
-              <select className="select" value={form.metodo} onChange={e => setForm(f => ({ ...f, metodo: e.target.value as Pagamento['metodo'] }))}>
-                <option value="pix">PIX</option><option value="cartao">Cartão</option><option value="boleto">Boleto</option>
-              </select>
-            </div>
-            <div className="field"><label>Status</label>
-              <select className="select" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as Pagamento['status'] }))}>
-                <option value="pendente">Pendente</option><option value="aprovado">Aprovado</option><option value="recusado">Recusado</option>
-              </select>
-            </div>
-          </div>
-        </Modal>
       )}
-
-      {modal === 'del' && (
-        <Modal title="Confirmar exclusão" onClose={() => setModal(null)} onConfirm={del} confirmLabel="Excluir" confirmClass="btn btn-danger">
-          <p style={{ color: 'var(--text-muted)' }}>Excluir pagamento <strong style={{ color: 'var(--text)' }}>#{selected?.id}</strong>?</p>
-        </Modal>
-      )}
-
-      <div className="toast-container">{toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}</div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
-export interface Modulo {
+export interface TrilhaCurso {
   id: number;
-  titulo: string;
+  trilhaId: number;
   cursoId: number;
   ordem: number;
 }

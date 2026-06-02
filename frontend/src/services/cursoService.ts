@@ -2,13 +2,14 @@ const BASE = 'http://localhost:3001';
 
 export interface Curso {
   id: number;
-  nome: string;
+  titulo: string;
   descricao: string;
-  cargaHoraria: number;
   instrutorId: number;
   categoriaId: number;
-  nivelId: number;
-  trilhaId: number;
+  nivel: string;
+  dataPublicacao: string;
+  totalAulas: number;
+  totalHoras: number;
 }
 
 export const cursoService = {
@@ -16,6 +17,8 @@ export const cursoService = {
     fetch(`${BASE}/cursos`).then(r => r.json()),
   getById: (id: number): Promise<Curso> =>
     fetch(`${BASE}/cursos/${id}`).then(r => r.json()),
+  getByCategoria: (categoriaId: number): Promise<Curso[]> =>
+    fetch(`${BASE}/cursos?categoriaId=${categoriaId}`).then(r => r.json()),
   create: (data: Omit<Curso, 'id'>): Promise<Curso> =>
     fetch(`${BASE}/cursos`, {
       method: 'POST',

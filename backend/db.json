@@ -14,45 +14,52 @@
     { "id": 2, "nome": "Ana Lima", "email": "ana@email.com", "bio": "Designer UX/UI" }
   ],
   "trilhas": [
-    { "id": 1, "nome": "Desenvolvimento Web", "descricao": "Do básico ao avançado em web", "categoriaId": 1 },
-    { "id": 2, "nome": "Design Digital", "descricao": "Criação e prototipação visual", "categoriaId": 2 }
+    { "id": 1, "titulo": "Desenvolvimento Web", "descricao": "Do básico ao avançado em web", "categoriaId": 1 },
+    { "id": 2, "titulo": "Design Digital", "descricao": "Criação e prototipação visual", "categoriaId": 2 }
+  ],
+  "trilhas_cursos": [
+    { "id": 1, "trilhaId": 1, "cursoId": 1, "ordem": 1 },
+    { "id": 2, "trilhaId": 2, "cursoId": 2, "ordem": 1 }
   ],
   "cursos": [
-    { "id": 1, "nome": "React do Zero", "descricao": "Aprenda React com hooks", "cargaHoraria": 40, "instrutorId": 1, "categoriaId": 1, "nivelId": 1, "trilhaId": 1 },
-    { "id": 2, "nome": "Figma Avançado", "descricao": "Protótipos e componentes", "cargaHoraria": 20, "instrutorId": 2, "categoriaId": 2, "nivelId": 3, "trilhaId": 2 }
+    { "id": 1, "titulo": "React do Zero", "descricao": "Aprenda React com hooks", "instrutorId": 1, "categoriaId": 1, "nivel": "Iniciante", "dataPublicacao": "2026-01-01", "totalAulas": 2, "totalHoras": 40 },
+    { "id": 2, "titulo": "Figma Avançado", "descricao": "Protótipos e componentes", "instrutorId": 2, "categoriaId": 2, "nivel": "Avançado", "dataPublicacao": "2026-02-01", "totalAulas": 1, "totalHoras": 20 }
   ],
   "modulos": [
-    { "id": 1, "nome": "Introdução ao React", "descricao": "Visão geral e configuração do ambiente", "ordem": 1, "cursoId": 1 },
-    { "id": 2, "nome": "Hooks e Estado", "descricao": "useState, useEffect e hooks customizados", "ordem": 2, "cursoId": 1 },
-    { "id": 3, "nome": "Fundamentos do Figma", "descricao": "Interface, ferramentas e fluxo de trabalho", "ordem": 1, "cursoId": 2 }
+    { "id": 1, "titulo": "Introdução ao React", "cursoId": 1, "ordem": 1 },
+    { "id": 2, "titulo": "Hooks e Estado", "cursoId": 1, "ordem": 2 },
+    { "id": 3, "titulo": "Fundamentos do Figma", "cursoId": 2, "ordem": 1 }
   ],
   "aulas": [
-    { "id": 1, "nome": "O que é React?", "descricao": "Visão geral do framework", "tipo": "video", "url": "https://youtube.com", "duracao": 15, "ordem": 1, "moduloId": 1 },
-    { "id": 2, "nome": "useState", "descricao": "Gerenciando estado local", "tipo": "video", "url": "https://youtube.com", "duracao": 20, "ordem": 1, "moduloId": 2 }
+    { "id": 1, "titulo": "O que é React?", "moduloId": 1, "tipoConteudo": "Video", "urlConteudo": "https://youtube.com", "duracaoMinutos": 15, "ordem": 1 },
+    { "id": 2, "titulo": "useState", "moduloId": 2, "tipoConteudo": "Video", "urlConteudo": "https://youtube.com", "duracaoMinutos": 20, "ordem": 1 }
   ],
   "usuarios": [
-    { "id": 1, "nome": "João Souza", "email": "joao@email.com", "senha": "123456", "tipo": "aluno", "dataCadastro": "2026-01-01" },
-    { "id": 2, "nome": "Maria Fernanda", "email": "maria@email.com", "senha": "123456", "tipo": "admin", "dataCadastro": "2026-01-01" }
+    { "id": 1, "nomeCompleto": "João Souza", "email": "joao@email.com", "senhaHash": "123456", "dataCadastro": "2026-01-01" },
+    { "id": 2, "nomeCompleto": "Maria Fernanda", "email": "maria@email.com", "senhaHash": "123456", "dataCadastro": "2026-01-01" }
   ],
   "planos": [
-    { "id": 1, "nome": "Básico", "preco": 29.90, "descricao": "Acesso a cursos gratuitos" },
-    { "id": 2, "nome": "Premium", "preco": 59.90, "descricao": "Acesso ilimitado a todos os cursos" },
-    { "id": 3, "nome": "Anual", "preco": 499.90, "descricao": "Premium com desconto anual" }
+    { "id": 1, "nome": "Básico", "descricao": "Acesso a cursos gratuitos", "preco": 29.90, "duracaoMeses": 1 },
+    { "id": 2, "nome": "Premium", "descricao": "Acesso ilimitado a todos os cursos", "preco": 59.90, "duracaoMeses": 1 },
+    { "id": 3, "nome": "Anual", "descricao": "Premium com desconto anual", "preco": 499.90, "duracaoMeses": 12 }
   ],
   "assinaturas": [
-    { "id": 1, "usuarioId": 1, "planoId": 2, "dataInicio": "2026-01-01", "dataFim": "2026-12-31", "status": "ativa" }
+    { "id": 1, "usuarioId": 1, "planoId": 2, "dataInicio": "2026-01-01", "dataFim": "2026-12-31" }
+  ],
+  "pagamentos": [
+    { "id": 1, "assinaturaId": 1, "valorPago": 59.90, "dataPagamento": "2026-01-01", "metodoPagamento": "Cartão de Crédito", "idTransacaoGateway": "TXN-2026-0001" }
   ],
   "matriculas": [
-    { "id": 1, "usuarioId": 1, "cursoId": 1, "dataMatricula": "2026-01-15", "progresso": 75 },
-    { "id": 2, "usuarioId": 2, "cursoId": 2, "dataMatricula": "2026-02-01", "progresso": 30 }
+    { "id": 1, "usuarioId": 1, "cursoId": 1, "dataMatricula": "2026-01-15", "dataConclusao": null },
+    { "id": 2, "usuarioId": 2, "cursoId": 2, "dataMatricula": "2026-02-01", "dataConclusao": null }
+  ],
+  "progresso_aulas": [
+    { "id": 1, "usuarioId": 1, "aulaId": 1, "dataConclusao": "2026-02-01", "status": "Concluído" }
   ],
   "avaliacoes": [
     { "id": 1, "usuarioId": 1, "cursoId": 1, "nota": 5, "comentario": "Excelente curso!", "dataAvaliacao": "2026-03-10" }
   ],
   "certificados": [
-    { "id": 1, "usuarioId": 1, "cursoId": 1, "dataEmissao": "2026-03-01", "codigo": "CERT-2026-001", "cargaHoraria": 40 }
-  ],
-  "pagamentos": [
-    { "id": 1, "usuarioId": 1, "assinaturaId": 1, "valor": 59.90, "metodo": "cartao", "status": "aprovado", "dataPagamento": "2026-01-01" }
+    { "id": 1, "usuarioId": 1, "cursoId": 1, "trilhaId": null, "codigoVerificacao": "CERT-2026-001", "dataEmissao": "2026-03-01" }
   ]
 }

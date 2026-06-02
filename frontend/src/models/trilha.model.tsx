@@ -1,8 +1,6 @@
-import type { ICategoria } from "./categoria.model";
-
-export interface ITrilha{
-    id?: string;
-    titulo: string;
-    descricao: string;
-    categoria: ICategoria;
+export interface Trilha {
+  id: number;
+  titulo: string;
+  descricao: string;
+  categoriaId: number;
 }

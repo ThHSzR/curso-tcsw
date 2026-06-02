@@ -1,107 +1,99 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Modal } from '../../components/Modal';
-import { Toast } from '../../components/Toast';
-import { usuarioService } from '../../services/usuarioService';
+import { useEffect, useState } from 'react';
 import type { Usuario } from '../../services/usuarioService';
+import { usuarioService } from '../../services/usuarioService';
 
 export function Usuarios() {
-  const [items, setItems]       = useState<Usuario[]>([]);
-  const [search, setSearch]     = useState('');
-  const [modal, setModal]       = useState<'add'|'edit'|'del'|null>(null);
-  const [selected, setSelected] = useState<Usuario|null>(null);
-  const [form, setForm]         = useState({ nome:'', email:'', senha:'', tipo:'aluno' as Usuario['tipo'], dataCadastro: new Date().toISOString().slice(0,10) });
-  const [toast, setToast]       = useState<{msg:string;type:'success'|'error'}|null>(null);
-  const [loading, setLoading]   = useState(true);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [form, setForm] = useState<Omit<Usuario, 'id'>>({
+    nomeCompleto: '', email: '', senhaHash: '',
+    dataCadastro: new Date().toISOString().split('T')[0],
+  });
+  const [editId, setEditId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setItems(await usuarioService.getAll());
-    setLoading(false);
-  }, []);
+  const load = () => { setLoading(true); usuarioService.getAll().then(d => { setUsuarios(d); setLoading(false); }); };
+  useEffect(() => { load(); }, []);
 
-  useEffect(() => { load(); }, [load]);
-
-  const openAdd  = () => { setForm({ nome:'', email:'', senha:'', tipo:'aluno', dataCadastro: new Date().toISOString().slice(0,10) }); setModal('add'); };
-  const openEdit = (u: Usuario) => { setSelected(u); setForm({ nome:u.nome, email:u.email, senha:u.senha, tipo:u.tipo, dataCadastro:u.dataCadastro }); setModal('edit'); };
-  const openDel  = (u: Usuario) => { setSelected(u); setModal('del'); };
-
-  const save = async () => {
-    try {
-      if (modal==='add') await usuarioService.create(form);
-      else if (modal==='edit'&&selected) await usuarioService.update(selected.id!, form);
-      await load(); setModal(null);
-      setToast({ msg: modal==='add'?'Usuário criado!':'Usuário atualizado!', type:'success' });
-    } catch { setToast({ msg:'Erro ao salvar', type:'error' }); }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editId !== null) { await usuarioService.update(editId, form); }
+    else { await usuarioService.create(form); }
+    setForm({ nomeCompleto: '', email: '', senhaHash: '', dataCadastro: new Date().toISOString().split('T')[0] });
+    setEditId(null); load();
   };
 
-  const del = async () => {
-    try { await usuarioService.remove(selected!.id!); await load(); setModal(null); setToast({ msg:'Usuário removido', type:'success' }); }
-    catch { setToast({ msg:'Erro ao remover', type:'error' }); }
+  const handleEdit = (u: Usuario) => {
+    setForm({ nomeCompleto: u.nomeCompleto, email: u.email, senhaHash: u.senhaHash, dataCadastro: u.dataCadastro });
+    setEditId(u.id);
   };
 
-  const filtered = items.filter(i => i.nome.toLowerCase().includes(search.toLowerCase()) || i.email.toLowerCase().includes(search.toLowerCase()));
-  const tipoBadge = (t:string) => t==='admin'?'badge-danger':t==='instrutor'?'badge-warning':'badge-info';
-  const initials  = (nome:string) => nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+  const handleDelete = async (id: number) => {
+    if (!confirm('Excluir este usuário?')) return;
+    await usuarioService.remove(id); load();
+  };
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <div><h1 className="page-title">Usuários</h1><p className="page-subtitle">{items.length} usuários cadastrados</p></div>
-        <button className="btn btn-primary" onClick={openAdd}><i className="bi bi-plus-lg"></i> Novo Usuário</button>
+    <div className="page-container">
+      <div className="page-header"><h2>Usuários</h2></div>
+
+      <div className="card mb-4">
+        <div className="card-body">
+          <h5 className="card-title mb-3">{editId ? 'Editar Usuário' : 'Novo Usuário'}</h5>
+          <form onSubmit={handleSubmit}>
+            <div className="row g-3">
+              <div className="col-md-3">
+                <label className="form-label">Nome Completo</label>
+                <input className="form-control" value={form.nomeCompleto} onChange={e => setForm({ ...form, nomeCompleto: e.target.value })} required />
+              </div>
+              <div className="col-md-3">
+                <label className="form-label">E-mail</label>
+                <input type="email" className="form-control" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
+              </div>
+              <div className="col-md-3">
+                <label className="form-label">Senha</label>
+                <input type="password" className="form-control" value={form.senhaHash} onChange={e => setForm({ ...form, senhaHash: e.target.value })} required={editId === null} placeholder={editId ? 'Deixe em branco para manter' : ''} />
+              </div>
+              <div className="col-md-3">
+                <label className="form-label">Data de Cadastro</label>
+                <input type="date" className="form-control" value={form.dataCadastro} onChange={e => setForm({ ...form, dataCadastro: e.target.value })} required />
+              </div>
+            </div>
+            <div className="d-flex gap-2 mt-3">
+              <button type="submit" className="btn btn-primary">{editId ? 'Salvar' : 'Cadastrar'}</button>
+              {editId && <button type="button" className="btn btn-secondary" onClick={() => { setForm({ nomeCompleto: '', email: '', senhaHash: '', dataCadastro: new Date().toISOString().split('T')[0] }); setEditId(null); }}>Cancelar</button>}
+            </div>
+          </form>
+        </div>
       </div>
 
-      <div className="table-wrapper">
-        <div className="table-toolbar">
-          <span className="table-toolbar-title">Lista de usuários</span>
-          <div className="table-toolbar-right">
-            <div className="search-input"><i className="bi bi-search"></i><input placeholder="Buscar..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
+      {loading ? (
+        <div className="text-center py-4"><div className="spinner-border text-primary" /></div>
+      ) : (
+        <div className="card">
+          <div className="card-body p-0">
+            <table className="table table-hover mb-0">
+              <thead>
+                <tr><th>#</th><th>Nome Completo</th><th>E-mail</th><th>Data Cadastro</th><th style={{ width: 100 }}>Ações</th></tr>
+              </thead>
+              <tbody>
+                {usuarios.map(u => (
+                  <tr key={u.id}>
+                    <td>{u.id}</td>
+                    <td>{u.nomeCompleto}</td>
+                    <td>{u.email}</td>
+                    <td>{u.dataCadastro}</td>
+                    <td>
+                      <button className="btn btn-sm btn-outline-primary me-1" onClick={() => handleEdit(u)}><i className="bi bi-pencil" /></button>
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(u.id)}><i className="bi bi-trash" /></button>
+                    </td>
+                  </tr>
+                ))}
+                {usuarios.length === 0 && <tr><td colSpan={5} className="text-center text-muted py-4">Nenhum usuário cadastrado.</td></tr>}
+              </tbody>
+            </table>
           </div>
         </div>
-        <table>
-          <thead><tr><th>#</th><th>Usuário</th><th>Email</th><th>Tipo</th><th>Cadastro</th><th>Ações</th></tr></thead>
-          <tbody>
-            {loading ? <tr><td colSpan={6} className="table-empty"><i className="bi bi-arrow-repeat"></i><p>Carregando...</p></td></tr>
-            : filtered.length===0 ? <tr><td colSpan={6} className="table-empty"><i className="bi bi-inbox"></i><p>Nenhum usuário</p></td></tr>
-            : filtered.map(u => (
-              <tr key={u.id}>
-                <td className="td-muted">{u.id}</td>
-                <td><div style={{display:'flex',alignItems:'center',gap:10}}>
-                  <div style={{width:32,height:32,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0}}>{initials(u.nome)}</div>
-                  <span style={{fontWeight:500}}>{u.nome}</span>
-                </div></td>
-                <td className="td-muted">{u.email}</td>
-                <td><span className={`badge ${tipoBadge(u.tipo)}`}>{u.tipo}</span></td>
-                <td className="td-muted">{u.dataCadastro}</td>
-                <td><div className="table-actions">
-                  <button className="btn btn-ghost btn-icon btn-sm" onClick={()=>openEdit(u)}><i className="bi bi-pencil"></i></button>
-                  <button className="btn btn-danger btn-icon btn-sm" onClick={()=>openDel(u)}><i className="bi bi-trash3"></i></button>
-                </div></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {(modal==='add'||modal==='edit') && (
-        <Modal title={modal==='add'?'Novo Usuário':'Editar Usuário'} onClose={()=>setModal(null)} onConfirm={save}>
-          <div className="field"><label>Nome</label><input className="input" value={form.nome} onChange={e=>setForm(f=>({...f,nome:e.target.value}))} /></div>
-          <div className="field"><label>Email</label><input className="input" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} /></div>
-          <div className="field"><label>Senha</label><input className="input" type="password" value={form.senha} onChange={e=>setForm(f=>({...f,senha:e.target.value}))} /></div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-            <div className="field"><label>Tipo</label><select className="select" value={form.tipo} onChange={e=>setForm(f=>({...f,tipo:e.target.value as Usuario['tipo']}))}>               <option value="aluno">Aluno</option><option value="instrutor">Instrutor</option><option value="admin">Admin</option>
-            </select></div>
-            <div className="field"><label>Data de Cadastro</label><input className="input" type="date" value={form.dataCadastro} onChange={e=>setForm(f=>({...f,dataCadastro:e.target.value}))} /></div>
-          </div>
-        </Modal>
       )}
-
-      {modal==='del' && (
-        <Modal title="Confirmar exclusão" onClose={()=>setModal(null)} onConfirm={del} confirmLabel="Excluir" confirmClass="btn btn-danger">
-          <p style={{color:'var(--text-muted)'}}>Excluir o usuário <strong style={{color:'var(--text)'}}>{selected?.nome}</strong>?</p>
-        </Modal>
-      )}
-
-      <div className="toast-container">{toast && <Toast message={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}</div>
     </div>
   );
 }

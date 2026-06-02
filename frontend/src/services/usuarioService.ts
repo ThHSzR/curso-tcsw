@@ -1,11 +1,10 @@
 const BASE = 'http://localhost:3001';
 
 export interface Usuario {
-  id?: number;
-  nome: string;
+  id: number;
+  nomeCompleto: string;
   email: string;
-  senha: string;
-  tipo: 'aluno' | 'instrutor' | 'admin';
+  senhaHash: string;
   dataCadastro: string;
 }
 
@@ -20,7 +19,7 @@ export const usuarioService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     }).then(r => r.json()),
-  update: (id: number, data: Partial<Usuario>): Promise<Usuario> =>
+  update: (id: number, data: Partial<Omit<Usuario, 'id'>>): Promise<Usuario> =>
     fetch(`${BASE}/usuarios/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

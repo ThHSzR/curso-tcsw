@@ -1,8 +1,7 @@
 export interface Assinatura {
-  id?: number;
+  id: number;
   usuarioId: number;
   planoId: number;
   dataInicio: string;
   dataFim: string;
-  status: string;
 }

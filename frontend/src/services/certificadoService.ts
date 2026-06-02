@@ -1,12 +1,12 @@
 const BASE = 'http://localhost:3001';
 
 export interface Certificado {
-  id?: number;
+  id: number;
   usuarioId: number;
   cursoId: number;
+  trilhaId: number | null;
+  codigoVerificacao: string;
   dataEmissao: string;
-  codigo: string;
-  cargaHoraria: number;
 }
 
 export const certificadoService = {
@@ -20,7 +20,7 @@ export const certificadoService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     }).then(r => r.json()),
-  update: (id: number, data: Partial<Certificado>): Promise<Certificado> =>
+  update: (id: number, data: Partial<Omit<Certificado, 'id'>>): Promise<Certificado> =>
     fetch(`${BASE}/certificados/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
