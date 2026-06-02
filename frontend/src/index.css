@@ -652,7 +652,7 @@ tbody td {
 }
 
 .card-body {
-  padding: 20px !important;
+  padding: 24px !important;
   background: transparent !important;
 }
 
@@ -662,7 +662,7 @@ tbody td {
   color: var(--text-muted) !important;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 16px !important;
+  margin-bottom: 20px !important;
 }
 
 /* Bootstrap form controls → dark */
@@ -670,7 +670,7 @@ tbody td {
   font-size: 12px !important;
   font-weight: 500 !important;
   color: var(--text-muted) !important;
-  margin-bottom: 5px !important;
+  margin-bottom: 8px !important;
 }
 
 .form-control,
