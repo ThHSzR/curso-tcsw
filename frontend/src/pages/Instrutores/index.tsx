@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Instrutor } from '../../models/instrutor.model';
+import type { Instrutor } from '../../models/instrutor.model';
 
 const BASE = 'http://localhost:3001/instrutores';
 
 export function Instrutores() {
   const [instrutores, setInstrutores] = useState<Instrutor[]>([]);
-  const [form, setForm] = useState<Instrutor>({ nome: '', email: '', bio: '' });
+  const [form, setForm] = useState<Omit<Instrutor, 'id'>>({ nome: '', email: '', bio: '' });
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 

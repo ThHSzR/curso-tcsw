@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Nivel } from '../../models/nivel.model';
+import type { Nivel } from '../../models/nivel.model';
 
 const BASE = 'http://localhost:3001/niveis';
 
 export function Niveis() {
   const [niveis, setNiveis] = useState<Nivel[]>([]);
-  const [form, setForm] = useState<Nivel>({ nome: '' });
+  const [form, setForm] = useState<Omit<Nivel, 'id'>>({ nome: '' });
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +28,7 @@ export function Niveis() {
     load();
   };
 
-  const handleEdit = (n: Nivel) => { setForm({ nome: n.nome }); setEditId(n.id!); };
+  const handleEdit = (n: Nivel) => { setForm({ nome: n.nome }); setEditId(n.id); };
 
   const handleDelete = async (id: number) => {
     if (!confirm('Excluir este nível?')) return;
@@ -72,7 +72,7 @@ export function Niveis() {
                     <td>{n.nome}</td>
                     <td>
                       <button className="btn btn-sm btn-outline-primary me-1" onClick={() => handleEdit(n)}><i className="bi bi-pencil" /></button>
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(n.id!)}><i className="bi bi-trash" /></button>
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(n.id)}><i className="bi bi-trash" /></button>
                     </td>
                   </tr>
                 ))}
